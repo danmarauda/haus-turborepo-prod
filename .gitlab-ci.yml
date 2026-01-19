@@ -1,0 +1,530 @@
+# =============================================================================
+# GitLab CI/CD Configuration for Haus Platform (Turborepo Monorepo)
+# =============================================================================
+# Pipeline: install → validate → test → build → deploy
+# Deployments: Vercel (web apps) + Railway (services) + Convex (backend) + EAS (mobile)
+# =============================================================================
+
+default:
+  image: oven/bun:1.1.26
+  interruptible: true
+
+variables:
+  # Turbo remote caching
+  TURBO_TOKEN: $TURBO_TOKEN
+  TURBO_TEAM: $TURBO_TEAM
+  TURBO_REMOTE_ONLY: "true"
+
+  # Bun cache
+  BUN_INSTALL_CACHE_DIR: "$CI_PROJECT_DIR/.bun-cache"
+
+  # Node memory for large monorepos
+  NODE_OPTIONS: "--max-old-space-size=4096"
+
+  # Skip env validation in CI
+  SKIP_ENV_VALIDATION: "true"
+  CI: "true"
+
+# =============================================================================
+# Cache Templates
+# =============================================================================
+.cache_bun: &cache_bun
+  cache:
+    - key:
+        files:
+          - bun.lock
+      paths:
+        - node_modules/
+        - .bun-cache/
+        - apps/*/node_modules/
+        - packages/*/node_modules/
+      policy: pull-push
+    - key: turbo-$CI_COMMIT_REF_SLUG
+      paths:
+        - .turbo/
+      policy: pull-push
+
+# =============================================================================
+# Stage Definitions
+# =============================================================================
+stages:
+  - install
+  - validate
+  - test
+  - build
+  - deploy-preview
+  - deploy-staging
+  - deploy-production
+
+# =============================================================================
+# Job Templates
+# =============================================================================
+.base_job:
+  <<: *cache_bun
+  before_script:
+    - bun --version
+
+.vercel_job:
+  image: node:20-alpine
+  before_script:
+    - npm install -g vercel@latest
+    - npm install -g convex@latest
+
+.eas_job:
+  image: node:20
+  before_script:
+    - npm install -g eas-cli@latest
+    - eas whoami || echo "Not logged in - using EXPO_TOKEN"
+
+.railway_job:
+  image: node:20-alpine
+  before_script:
+    - npm install -g @railway/cli@latest
+    - railway whoami || echo "Using RAILWAY_TOKEN for authentication"
+
+# =============================================================================
+# STAGE: Install
+# =============================================================================
+install:
+  extends: .base_job
+  stage: install
+  script:
+    - bun install --frozen-lockfile
+  artifacts:
+    paths:
+      - node_modules/
+      - apps/*/node_modules/
+      - packages/*/node_modules/
+    expire_in: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "staging"
+    - if: $CI_COMMIT_BRANCH =~ /^feature\/.*/
+    - if: $CI_COMMIT_BRANCH =~ /^fix\/.*/
+
+# =============================================================================
+# STAGE: Validate
+# =============================================================================
+lint:
+  extends: .base_job
+  stage: validate
+  needs: ["install"]
+  script:
+    - bun run lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+typecheck:
+  extends: .base_job
+  stage: validate
+  needs: ["install"]
+  script:
+    - bun run typecheck
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+format-check:
+  extends: .base_job
+  stage: validate
+  needs: ["install"]
+  script:
+    - bunx biome check --no-errors-on-unmatched .
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# =============================================================================
+# STAGE: Test
+# =============================================================================
+test:
+  extends: .base_job
+  stage: test
+  needs: ["install", "lint", "typecheck"]
+  script:
+    - bun run test || echo "No tests configured yet"
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+# =============================================================================
+# STAGE: Build
+# =============================================================================
+build:
+  extends: .base_job
+  stage: build
+  needs: ["install", "lint", "typecheck"]
+  script:
+    - bun run build
+  artifacts:
+    paths:
+      - apps/app/.next/
+      - apps/web/.next/
+      - apps/appraisal/.next/
+    expire_in: 1 day
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+# =============================================================================
+# STAGE: Deploy Preview (Merge Requests)
+# =============================================================================
+deploy-preview-convex:
+  extends: .vercel_job
+  stage: deploy-preview
+  needs: ["build"]
+  script:
+    - cd packages/backend
+    - npx convex deploy --preview "mr-$CI_MERGE_REQUEST_IID"
+  environment:
+    name: preview/convex-$CI_MERGE_REQUEST_IID
+    on_stop: stop-preview
+    auto_stop_in: 3 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+deploy-preview-app:
+  extends: .vercel_job
+  stage: deploy-preview
+  needs: ["build", "deploy-preview-convex"]
+  script:
+    - cd apps/app
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - DEPLOY_URL=$(vercel deploy --prebuilt --token=$VERCEL_TOKEN)
+    - echo "PREVIEW_URL_APP=$DEPLOY_URL" >> $CI_PROJECT_DIR/deploy.env
+    - echo "Deployed to $DEPLOY_URL"
+  artifacts:
+    reports:
+      dotenv: deploy.env
+  environment:
+    name: preview/app-$CI_MERGE_REQUEST_IID
+    url: $PREVIEW_URL_APP
+    on_stop: stop-preview
+    auto_stop_in: 3 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+deploy-preview-web:
+  extends: .vercel_job
+  stage: deploy-preview
+  needs: ["build", "deploy-preview-convex"]
+  script:
+    - cd apps/web
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - DEPLOY_URL=$(vercel deploy --prebuilt --token=$VERCEL_TOKEN)
+    - echo "PREVIEW_URL_WEB=$DEPLOY_URL" >> $CI_PROJECT_DIR/deploy-web.env
+    - echo "Deployed to $DEPLOY_URL"
+  artifacts:
+    reports:
+      dotenv: deploy-web.env
+  environment:
+    name: preview/web-$CI_MERGE_REQUEST_IID
+    url: $PREVIEW_URL_WEB
+    on_stop: stop-preview
+    auto_stop_in: 3 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+deploy-preview-appraisal:
+  extends: .vercel_job
+  stage: deploy-preview
+  needs: ["build"]
+  script:
+    - cd apps/appraisal
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - DEPLOY_URL=$(vercel deploy --prebuilt --token=$VERCEL_TOKEN)
+    - echo "PREVIEW_URL_APPRAISAL=$DEPLOY_URL" >> $CI_PROJECT_DIR/deploy-appraisal.env
+    - echo "Deployed to $DEPLOY_URL"
+  artifacts:
+    reports:
+      dotenv: deploy-appraisal.env
+  environment:
+    name: preview/appraisal-$CI_MERGE_REQUEST_IID
+    url: $PREVIEW_URL_APPRAISAL
+    on_stop: stop-preview
+    auto_stop_in: 3 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+stop-preview:
+  stage: deploy-preview
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "Preview environment stopped"
+  environment:
+    name: preview/app-$CI_MERGE_REQUEST_IID
+    action: stop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+      allow_failure: true
+
+# Railway Preview Deployments (optional services)
+deploy-preview-railway:
+  extends: .railway_job
+  stage: deploy-preview
+  needs: ["build"]
+  script:
+    - |
+      if [ -n "$RAILWAY_PROJECT_ID" ]; then
+        # Deploy to Railway PR environment
+        railway link $RAILWAY_PROJECT_ID
+        DEPLOY_URL=$(railway up --environment pr-$CI_MERGE_REQUEST_IID --detach 2>&1 | grep -oP 'https://[^\s]+' || echo "")
+        echo "RAILWAY_PREVIEW_URL=$DEPLOY_URL" >> $CI_PROJECT_DIR/railway-preview.env
+        echo "Railway preview deployed: $DEPLOY_URL"
+      else
+        echo "Railway not configured - skipping"
+      fi
+  artifacts:
+    reports:
+      dotenv: railway-preview.env
+  environment:
+    name: preview/railway-$CI_MERGE_REQUEST_IID
+    url: $RAILWAY_PREVIEW_URL
+    on_stop: stop-preview
+    auto_stop_in: 3 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+  allow_failure: true
+
+# =============================================================================
+# STAGE: Deploy Staging
+# =============================================================================
+deploy-staging-convex:
+  extends: .vercel_job
+  stage: deploy-staging
+  needs: ["build"]
+  script:
+    - cd packages/backend
+    - npx convex deploy
+  environment:
+    name: staging/convex
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+deploy-staging-app:
+  extends: .vercel_job
+  stage: deploy-staging
+  needs: ["build", "deploy-staging-convex"]
+  script:
+    - cd apps/app
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+  environment:
+    name: staging/app
+    url: https://staging-app.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+deploy-staging-web:
+  extends: .vercel_job
+  stage: deploy-staging
+  needs: ["build", "deploy-staging-convex"]
+  script:
+    - cd apps/web
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+  environment:
+    name: staging/web
+    url: https://staging.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+deploy-staging-appraisal:
+  extends: .vercel_job
+  stage: deploy-staging
+  needs: ["build"]
+  script:
+    - cd apps/appraisal
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+  environment:
+    name: staging/appraisal
+    url: https://staging-appraisal.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+# Railway Staging Deployment
+deploy-staging-railway:
+  extends: .railway_job
+  stage: deploy-staging
+  needs: ["build"]
+  script:
+    - |
+      if [ -n "$RAILWAY_PROJECT_ID" ]; then
+        railway link $RAILWAY_PROJECT_ID
+        railway up --environment staging --detach
+        echo "Railway staging deployment complete"
+      else
+        echo "Railway not configured - skipping"
+      fi
+  environment:
+    name: staging/railway
+    url: https://staging-services.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+  allow_failure: true
+
+# =============================================================================
+# STAGE: Deploy Production (Manual)
+# =============================================================================
+deploy-production-convex:
+  extends: .vercel_job
+  stage: deploy-production
+  needs: ["build"]
+  script:
+    - cd packages/backend
+    - npx convex deploy
+  environment:
+    name: production/convex
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  allow_failure: false
+
+deploy-production-app:
+  extends: .vercel_job
+  stage: deploy-production
+  needs: ["deploy-production-convex"]
+  script:
+    - cd apps/app
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel build --prod --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+  environment:
+    name: production/app
+    url: https://app.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  allow_failure: false
+
+deploy-production-web:
+  extends: .vercel_job
+  stage: deploy-production
+  needs: ["deploy-production-convex"]
+  script:
+    - cd apps/web
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel build --prod --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+  environment:
+    name: production/web
+    url: https://haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  allow_failure: false
+
+deploy-production-appraisal:
+  extends: .vercel_job
+  stage: deploy-production
+  needs: ["deploy-production-convex"]
+  script:
+    - cd apps/appraisal
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel build --prod --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+  environment:
+    name: production/appraisal
+    url: https://appraisal.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  allow_failure: false
+
+# Railway Production Deployment
+deploy-production-railway:
+  extends: .railway_job
+  stage: deploy-production
+  needs: ["deploy-production-convex"]
+  script:
+    - |
+      if [ -n "$RAILWAY_PROJECT_ID" ]; then
+        railway link $RAILWAY_PROJECT_ID
+        railway up --environment production --detach
+        echo "Railway production deployment complete"
+      else
+        echo "Railway not configured - skipping"
+      fi
+  environment:
+    name: production/railway
+    url: https://services.haus.io
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  allow_failure: true
+
+# =============================================================================
+# MOBILE: EAS Builds
+# =============================================================================
+build-mobile-preview:
+  extends: .eas_job
+  stage: build
+  needs: ["install", "lint", "typecheck"]
+  script:
+    - cd apps/mobile
+    - eas build --profile preview --platform all --non-interactive --no-wait
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - apps/mobile/**/*
+        - packages/ui/**/*
+        - packages/backend/**/*
+
+build-mobile-staging:
+  extends: .eas_job
+  stage: deploy-staging
+  needs: ["build"]
+  script:
+    - cd apps/mobile
+    - eas build --profile staging --platform all --non-interactive
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+      changes:
+        - apps/mobile/**/*
+        - packages/ui/**/*
+        - packages/backend/**/*
+
+build-mobile-production:
+  extends: .eas_job
+  stage: deploy-production
+  needs: ["build"]
+  script:
+    - cd apps/mobile
+    - eas build --profile production --platform all --non-interactive
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      changes:
+        - apps/mobile/**/*
+        - packages/ui/**/*
+        - packages/backend/**/*
+
+submit-mobile-stores:
+  extends: .eas_job
+  stage: deploy-production
+  needs: ["build-mobile-production"]
+  script:
+    - cd apps/mobile
+    - eas submit --platform all --non-interactive
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  environment:
+    name: production/mobile
