@@ -153,6 +153,28 @@ test:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "staging"
 
+# Feature Port Tests (triggered by feat(ported): commit messages)
+test:ported-feature:
+  extends: .base_job
+  stage: test
+  needs: ["install", "lint", "typecheck"]
+  script:
+    - bun run test:unit -- --run 2>&1 | tee test-results.txt
+    - bun run test:integration -- --run 2>&1 | tee -a test-results.txt
+    - bun run test:e2e 2>&1 | tee -a test-results.txt
+  artifacts:
+    reports:
+      junit: test-results.xml
+    paths:
+      - test-results/
+      - test-screenshots/
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /^feat\(ported\):/
+      when: on_success
+  allow_failure: false
+
 # =============================================================================
 # STAGE: Build
 # =============================================================================
@@ -298,6 +320,86 @@ deploy-preview-railway:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
   allow_failure: true
+
+# =============================================================================
+# FEATURE PORT: Preview Deployments for Ported Features
+# Triggered by commits with "feat(ported):" prefix
+# =============================================================================
+deploy-preview:ported-feature:
+  extends: .vercel_job
+  stage: deploy-preview
+  needs: ["build", "test:ported-feature"]
+  script:
+    - |
+      # Extract feature name from commit message
+      FEATURE_NAME=$(echo $CI_COMMIT_MESSAGE | sed -E 's/feat\(ported\): (.+) - .*/\1/' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+      TARGET_APP=$(echo $CI_COMMIT_MESSAGE | sed -E 's/.*target:\s*(\w+).*/\1/')
+      echo "Deploying ported feature: $FEATURE_NAME to app: $TARGET_APP"
+
+      # Deploy to appropriate app
+      cd apps/$TARGET_APP
+
+      # Pull and build
+      vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+      vercel build --token=$VERCEL_TOKEN
+
+      # Deploy with feature name
+      DEPLOY_URL=$(vercel deploy --prebuilt --token=$VERCEL_TOKEN)
+      echo "DEPLOYED_FEATURE_URL=$DEPLOY_URL" >> $CI_PROJECT_DIR/ported-feature.env
+      echo "Feature deployed to: $DEPLOY_URL"
+
+      # Run browser validation (if agent-browser is available)
+      - |
+        if command -v agent-browser &> /dev/null; then
+          echo "Running browser validation..."
+          agent-browser open $DEPLOY_URL
+          sleep 5
+          agent-browser screenshot /tmp/feature-port-validation-$FEATURE_NAME.png
+          agent-browser close
+          echo "Screenshot saved to /tmp/feature-port-validation-$FEATURE_NAME.png"
+        fi
+
+      # Comment on MR with preview URL (using GitLab API)
+      - |
+        if [ -n "$CI_MERGE_REQUEST_IID" ]; then
+          COMMENT="**Feature Port Complete!**\n\nFeature: $FEATURE_NAME\nTarget App: $TARGET_APP\n\n**Preview URL:** $DEPLOY_URL\n\n[Screenshot](/tmp/feature-port-validation-$FEATURE_NAME.png)"
+          curl -X POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" \
+            -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$COMMENT\"}"
+        fi
+  artifacts:
+    reports:
+      dotenv: ported-feature.env
+    paths:
+      - /tmp/feature-port-validation-*.png
+    expire_in: 7 days
+    when: always
+  environment:
+    name: preview/ported-$FEATURE_NAME
+    url: $DEPLOYED_FEATURE_URL
+    on_stop: stop-preview:ported-feature
+    auto_stop_in: 7 days
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /^feat\(ported\):/
+      when: on_success
+  allow_failure: false
+
+stop-preview:ported-feature:
+  stage: deploy-preview
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "Stopping feature port preview environment"
+    - FEATURE_NAME=$(echo $CI_COMMIT_MESSAGE | sed -E 's/feat\(ported\): (.+) - .*/\1/' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+    - vercel alias rm $FEATURE_NAME --token=$VERCEL_TOKEN || true
+  environment:
+    name: preview/ported-$FEATURE_NAME
+    action: stop
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /^feat\(ported\):/
+      when: manual
+      allow_failure: true
 
 # =============================================================================
 # STAGE: Deploy Staging

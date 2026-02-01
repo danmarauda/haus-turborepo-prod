@@ -26,16 +26,16 @@ import {
   SquareIcon,
   ChevronRight,
 } from "lucide-react"
-import { Button } from "@haus/ui/button"
-import { Input } from "@haus/ui/input"
-import { Badge } from "@haus/ui/badge"
-import { Card, CardContent } from "@haus/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@haus/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@haus/ui/sheet"
-import { Slider } from "@haus/ui/slider"
-import { Checkbox } from "@haus/ui/checkbox"
-import { Separator } from "@haus/ui/separator"
+import { Button } from "@v1/ui/button"
+import { Input } from "@v1/ui/input"
+import { Badge } from "@v1/ui/badge"
+import { Card, CardContent } from "@v1/ui/card"
+import { Tabs, TabsList, TabsTrigger } from "@v1/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@v1/ui/sheet"
+import { Slider } from "@v1/ui/slider"
+import { Checkbox } from "@v1/ui/checkbox"
+import { Separator } from "@v1/ui/separator"
 import type { CommercialProperty, CommercialPropertyType, ZoningType } from "@/types/commercial"
 
 // Property type categories

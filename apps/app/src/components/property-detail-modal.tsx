@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import type { Property } from "@/types/property"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@haus/ui/dialog"
-import { Badge } from "@haus/ui/badge"
-import { Button } from "@haus/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@haus/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@haus/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@v1/ui/dialog"
+import { Badge } from "@v1/ui/badge"
+import { Button } from "@v1/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@v1/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@v1/ui/tabs"
 import {
   Heart,
   Share2,

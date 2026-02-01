@@ -1,0 +1,76 @@
+{
+  "app": {
+    "name": "HAUS",
+    "tagline": "Inteligência de Imóveis com IA"
+  },
+  "tabs": {
+    "home": "Início",
+    "search": "Buscar",
+    "compass": "Bússola",
+    "saved": "Salvos",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signUp": "Cadastrar",
+    "signOut": "Sair",
+    "email": "E-mail",
+    "password": "Senha",
+    "forgotPassword": "Esqueceu sua senha?",
+    "resetPassword": "Redefinir Senha",
+    "noAccount": "Não tem uma conta?",
+    "hasAccount": "Já tem uma conta?",
+    "signInError": "E-mail ou senha inválidos",
+    "signUpError": "Falha ao criar conta",
+    "signInSuccess": "Bem-vindo de volta!",
+    "signUpSuccess": "Conta criada com sucesso"
+  },
+  "search": {
+    "title": "Busca de Imóveis",
+    "placeholder": "Descreva seu imóvel ideal...",
+    "listening": "Ouvindo...",
+    "processing": "Processando...",
+    "filters": "Filtros",
+    "results": "Resultados",
+    "noResults": "Nenhum imóvel encontrado",
+    "tryDifferent": "Tente outros termos de busca"
+  },
+  "property": {
+    "title": "Detalhes do Imóvel",
+    "price": "Preço",
+    "bedrooms": "Quartos",
+    "bathrooms": "Banheiros",
+    "parking": "Estacionamento",
+    "landSize": "Tamanho do Terreno",
+    "description": "Descrição",
+    "features": "Características",
+    "location": "Localização",
+    "save": "Salvar Imóvel",
+    "unsave": "Remover",
+    "contact": "Contatar Corretor",
+    "tour": "Agendar Visita",
+    "saved": "Imóvel salvo",
+    "unsaved": "Imóvel removido"
+  },
+  "voice": {
+    "tapToSpeak": "Toque para falar",
+    "listening": "Ouvindo...",
+    "processing": "Processando...",
+    "error": "Não foi possível entender. Por favor, tente novamente.",
+    "microphonePermission": "Permissão de microfone é necessária para busca por voz."
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "retry": "Tentar Novamente",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "done": "Concluído"
+  }
+}

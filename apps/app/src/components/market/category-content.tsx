@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent } from "@haus/ui/card"
-import { Button } from "@haus/ui/button"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
-import { Checkbox } from "@haus/ui/checkbox"
-import { Slider } from "@haus/ui/slider"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@haus/ui/sheet"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
+import { Card, CardContent } from "@v1/ui/card"
+import { Button } from "@v1/ui/button"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
+import { Checkbox } from "@v1/ui/checkbox"
+import { Slider } from "@v1/ui/slider"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@v1/ui/sheet"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
 import {
   Shield,
   ShieldCheck,

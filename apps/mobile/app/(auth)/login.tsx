@@ -3,21 +3,22 @@ import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
+import { useAuth } from '@/services/auth';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { signIn, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    setIsLoading(true);
-    // TODO: Implement Convex auth
-    setTimeout(() => {
-      setIsLoading(false);
-      router.replace('/(tabs)');
-    }, 1000);
+    // Basic validation
+    if (!email || !password) {
+      return;
+    }
+
+    await signIn({ email, password });
   };
 
   return (
@@ -84,9 +85,11 @@ export default function LoginScreen() {
             </View>
 
             {/* Forgot Password */}
-            <Pressable className="self-end">
-              <Text className="text-primary font-medium">Forgot password?</Text>
-            </Pressable>
+            <Link href="/(auth)/reset-password" asChild>
+              <Pressable className="self-end">
+                <Text className="text-primary font-medium">Forgot password?</Text>
+              </Pressable>
+            </Link>
 
             {/* Sign In Button */}
             <Pressable

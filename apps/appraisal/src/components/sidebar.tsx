@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@haus/ui/tooltip";
+} from "@v1/ui/tooltip";
 import {
   BarChart2,
   FileText,

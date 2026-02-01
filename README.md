@@ -37,6 +37,26 @@ reuse and best practices that will grow with your business.
 [Polar](https://polar.sh) - Billing<br>
 [nuqs](https://nuqs.47ng.com/) - Type-safe search params state manager<br>
 [next-themes](https://next-themes-example.vercel.app/) - Theme manager<br>
+**[Cortex](https://github.com/SaintNick1214/Project-Cortex)** - AI agent memory system for persistent context<br>
+**[LiveKit](https://livekit.io/)** - Real-time voice & video for AI agents
+
+### HAUS: Cortex Memory Integration
+
+This repository includes a full Cortex integration for the HAUS voice AI assistant:
+
+- **Persistent Memory:** Conversations, property interactions, and user preferences are stored
+- **Suburb Learning:** Voice queries teach the system which suburbs users prefer (or avoid)
+- **Context Recall:** Property searches are personalized based on past interactions
+- **Multi-Platform:** Memory works across web and mobile with full parity
+
+**Key Files:**
+- `packages/backend/convex/cortex.ts` - Cortex functions
+- `apps/app/src/hooks/use-cortex-memory.ts` - Web React hooks
+- `apps/mobile/hooks/useCortexMemory.ts` - Mobile React hooks
+- `apps/app/src/components/haus/memory-context-panel.tsx` - Web memory UI
+- `apps/mobile/components/memory/` - Mobile memory UI
+
+**Production Deployment:** `https://veracious-camel-246.convex.cloud`
 
 ## Directory Structure
 

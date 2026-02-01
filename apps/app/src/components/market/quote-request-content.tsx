@@ -3,16 +3,16 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Card, CardContent } from "@haus/ui/card"
-import { Button } from "@haus/ui/button"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
-import { Label } from "@haus/ui/label"
-import { Textarea } from "@haus/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@haus/ui/radio-group"
-import { Checkbox } from "@haus/ui/checkbox"
-import { Progress } from "@haus/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
+import { Card, CardContent } from "@v1/ui/card"
+import { Button } from "@v1/ui/button"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
+import { Label } from "@v1/ui/label"
+import { Textarea } from "@v1/ui/textarea"
+import { RadioGroup, RadioGroupItem } from "@v1/ui/radio-group"
+import { Checkbox } from "@v1/ui/checkbox"
+import { Progress } from "@v1/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
 import {
   Shield,
   ShieldCheck,

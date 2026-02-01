@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@haus/ui/button";
-import { Card, CardContent } from "@haus/ui/card";
-import { Input } from "@haus/ui/input";
+import { Button } from "@v1/ui/button";
+import { Card, CardContent } from "@v1/ui/card";
+import { Input } from "@v1/ui/input";
 import { 
   Search, 
   Hammer, 

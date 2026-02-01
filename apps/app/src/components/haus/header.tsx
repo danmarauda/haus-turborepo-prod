@@ -3,10 +3,10 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { HausLogo } from "./haus-logo"
-import { Button } from "@haus/ui/button"
+import { Button } from "@v1/ui/button"
 import { ArrowRight, Heart, Menu, Home, Search, Compass, Plus, LogOut, Settings, User } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
-import { Sheet, SheetContent, SheetTrigger } from "@haus/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger } from "@v1/ui/sheet"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +14,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@haus/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@haus/ui/avatar"
+} from "@v1/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@v1/ui/avatar"
 import { cn } from "@/lib/utils"
 
 // Mock user data - in production this would come from auth context

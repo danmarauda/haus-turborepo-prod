@@ -36,13 +36,17 @@ import {
   Tag,
   Star,
   Gavel,
+  Brain,
 } from "lucide-react"
 import { PriceRangeSlider } from "./price-range-slider"
+import { useCortexMemory, useConversationMemory, type RecallResult } from "@/hooks/use-cortex-memory"
+import { MemoryContextPanel, MemoryQuickSummary } from "./memory-context-panel"
 
 interface VoiceCopilotModalProps {
   onResults: (results: VoiceSearchResult) => void
   onClose: () => void
   initialParams?: SearchParameters
+  userId?: string
 }
 
 type SearchStatus = "demo" | "idle" | "listening" | "processing" | "confirming" | "done"
@@ -235,7 +239,7 @@ const generateHistogramData = (length: number): number[] => {
   return data
 }
 
-export function VoiceCopilotModal({ onResults, onClose, initialParams }: VoiceCopilotModalProps) {
+export function VoiceCopilotModal({ onResults, onClose, initialParams, userId = "anonymous" }: VoiceCopilotModalProps) {
   const [status, setStatus] = useState<SearchStatus>("demo")
   const [isDemoMode, setIsDemoMode] = useState(true)
   const [isClient, setIsClient] = useState(false)
@@ -252,6 +256,28 @@ export function VoiceCopilotModal({ onResults, onClose, initialParams }: VoiceCo
   const [searchParams, setSearchParams] = useState<ExtendedSearchParams>(initialParams || initialSearchParams)
   const [glowingParams, setGlowingParams] = useState<Set<string>>(new Set())
   const [highlightedText, setHighlightedText] = useState<string[]>([])
+
+  // Cortex memory state
+  const [showMemory, setShowMemory] = useState(false)
+  const [memoryContext, setMemoryContext] = useState<RecallResult | null>(null)
+  const [lastStoredConversationId, setLastStoredConversationId] = useState<string | null>(null)
+
+  // Cortex memory hooks
+  const cortex = useCortexMemory({
+    userId,
+    enabled: !!userId && userId !== "anonymous",
+  })
+
+  const conversationMemory = useConversationMemory({
+    userId,
+    enabled: !!userId && userId !== "anonymous",
+    onConversationStored: (conversationId) => {
+      console.log("[VoiceCopilotModal] Conversation stored:", conversationId)
+      setLastStoredConversationId(conversationId)
+      // Refresh memory context after storing
+      recallMemoryContext()
+    },
+  })
 
   const recognitionRef = useRef<any>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -280,6 +306,68 @@ export function VoiceCopilotModal({ onResults, onClose, initialParams }: VoiceCo
       })
     }, 2000)
   }, [])
+
+  // Recall memory context from Cortex
+  const recallMemoryContext = useCallback(async () => {
+    if (userId === "anonymous") return
+
+    try {
+      const context = await cortex.recallForQuery(transcript || "property search", 20)
+      setMemoryContext(context)
+      console.log("[VoiceCopilotModal] Recalled memory context:", {
+        suburbPreferences: context.suburbPreferences.length,
+        facts: context.facts.length,
+        propertyInteractions: context.propertyInteractions.length,
+      })
+    } catch (error) {
+      console.error("[VoiceCopilotModal] Failed to recall memory:", error)
+    }
+  }, [cortex, transcript, userId])
+
+  // Recall memory when switching to real search mode
+  useEffect(() => {
+    if (!isDemoMode && userId !== "anonymous") {
+      recallMemoryContext()
+    }
+  }, [isDemoMode, userId, recallMemoryContext])
+
+  // Track conversation completion and store in Cortex
+  const lastStatusRef = useRef<SearchStatus>("demo")
+  useEffect(() => {
+    const statusChanged = status !== lastStatusRef.current
+    const prevStatus = lastStatusRef.current
+    lastStatusRef.current = status
+
+    // When transitioning from processing to confirming, store the conversation
+    if (
+      statusChanged &&
+      prevStatus === "processing" &&
+      status === "confirming" &&
+      transcript &&
+      userId !== "anonymous"
+    ) {
+      // Generate a mock agent response based on extracted params
+      const agentResponse = generateAgentResponse(searchParams)
+      conversationMemory.storeConversation({
+        userQuery: transcript,
+        agentResponse,
+        propertyContext: searchParams,
+      })
+    }
+  }, [status, transcript, searchParams, conversationMemory, userId])
+
+  // Generate agent response from search params
+  const generateAgentResponse = (params: ExtendedSearchParams): string => {
+    const parts: string[] = []
+    if (params.location) parts.push(`in ${params.location}`)
+    if (params.propertyType) parts.push(params.propertyType)
+    if (params.bedrooms) parts.push(`${params.bedrooms}+ bedrooms`)
+    if (params.priceRange) {
+      if (params.priceRange.max) parts.push(`under $${(params.priceRange.max / 1000000).toFixed(1)}M`)
+      if (params.priceRange.min) parts.push(`over $${(params.priceRange.min / 1000000).toFixed(1)}M`)
+    }
+    return `I found properties ${parts.join(", ") || "matching your criteria"}`
+  }
 
   // Typing animation effect
   useEffect(() => {
@@ -690,6 +778,51 @@ export function VoiceCopilotModal({ onResults, onClose, initialParams }: VoiceCo
             </span>
           </p>
         </div>
+
+        {/* Memory Quick Summary (always shown when available) */}
+        {!isDemoMode && memoryContext && (
+          <div className="flex-shrink-0 px-2 mb-3">
+            <MemoryQuickSummary
+              suburbPreferences={memoryContext.suburbPreferences}
+              facts={memoryContext.facts}
+              onShowFullContext={() => setShowMemory(true)}
+            />
+          </div>
+        )}
+
+        {/* Memory Toggle Button */}
+        {!isDemoMode && userId !== "anonymous" && (
+          <div className="flex-shrink-0 mb-3 px-2">
+            <button
+              onClick={() => setShowMemory(!showMemory)}
+              className={cn(
+                "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                showMemory
+                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  : "bg-zinc-800/50 text-zinc-500 border border-zinc-700/30 hover:bg-zinc-800/70 hover:text-zinc-300"
+              )}
+            >
+              <Brain className="w-3.5 h-3.5" />
+              <span>{showMemory ? "Hide" : "Show"} Memory Context</span>
+              {cortex.isLoading && (
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Full Memory Context Panel */}
+        {showMemory && !isDemoMode && (
+          <div className="flex-shrink-0 mb-3 px-2">
+            <MemoryContextPanel
+              suburbPreferences={memoryContext?.suburbPreferences ?? []}
+              facts={memoryContext?.facts ?? []}
+              propertyInteractions={memoryContext?.propertyInteractions ?? []}
+              memories={memoryContext?.memories ?? []}
+              isLoading={cortex.isLoading}
+            />
+          </div>
+        )}
 
         {/* Parameter Grid */}
         <div className="flex-grow my-2 overflow-y-auto pr-2 scrollbar-hide">

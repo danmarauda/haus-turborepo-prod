@@ -129,3 +129,103 @@ export const deleteCurrentUserAccount = action({
     });
   },
 });
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RevenueCat Premium Sync (for Mobile App)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/**
+ * Syncs premium subscription status from RevenueCat (mobile app)
+ * Called by RevenueCatContext when subscription status changes
+ */
+export const syncPremiumStatus = mutation({
+  args: {
+    revenueCatId: v.string(), // RevenueCat originalAppUserId
+    isPremium: v.boolean(), // Premium subscription status
+    latestExpiration: v.optional(v.nullable(v.string())), // ISO date string
+    entitlements: v.optional(v.record(v.string(), v.any())), // Active entitlements
+    subscriptions: v.optional(v.record(v.string(), v.any())), // Subscription details
+    allPurchasedProducts: v.optional(v.array(v.string())), // All purchased product IDs
+  },
+  handler: async (ctx, args) => {
+    const { revenueCatId, isPremium, latestExpiration, entitlements, subscriptions } = args;
+
+    // Find user by revenueCatId
+    const userByRevenueCatId = await ctx.db
+      .query("users")
+      .withIndex("revenueCatId", (q) => q.eq("revenueCatId", revenueCatId))
+      .unique();
+
+    if (userByRevenueCatId) {
+      // Update existing user's premium status
+      await ctx.db.patch(userByRevenueCatId._id, {
+        isPremium,
+        premiumExpiresAt: latestExpiration ? new Date(latestExpiration).getTime() : undefined,
+        premiumEntitlements: entitlements,
+        premiumSubscriptions: subscriptions,
+        premiumUpdatedAt: Date.now(),
+      });
+      return { success: true, userId: userByRevenueCatId._id };
+    }
+
+    // If no user found by revenueCatId, this might be a new user
+    // The mobile app should call this after authentication
+    return { success: false, error: "User not found" };
+  },
+});
+
+/**
+ * Links RevenueCat ID to authenticated user (call after sign-in)
+ */
+export const linkRevenueCatAccount = mutation({
+  args: {
+    revenueCatId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Check if RevenueCat ID is already linked to another user
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("revenueCatId", (q) => q.eq("revenueCatId", args.revenueCatId))
+      .unique();
+
+    if (existing && existing._id !== userId) {
+      throw new Error("RevenueCat account already linked to another user");
+    }
+
+    // Link RevenueCat ID to current user
+    await ctx.db.patch(userId, {
+      revenueCatId: args.revenueCatId,
+    });
+
+    return { success: true };
+  },
+});
+
+/**
+ * Gets premium status for current user
+ */
+export const getPremiumStatus = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return { isPremium: false };
+    }
+
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      return { isPremium: false };
+    }
+
+    return {
+      isPremium: user.isPremium ?? false,
+      expiresAt: user.premiumExpiresAt,
+      entitlements: user.premiumEntitlements,
+    };
+  },
+});

@@ -4,9 +4,14 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@haus/backend/*": ["../../packages/backend/*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@haus/backend/*": [
+        "../../packages/backend/*"
+      ]
+    },
+    "strictNullChecks": true
   },
   "include": [
     "**/*.ts",

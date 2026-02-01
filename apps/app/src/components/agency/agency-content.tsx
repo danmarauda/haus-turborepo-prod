@@ -23,14 +23,14 @@ import {
   DollarSign,
   Heart,
 } from "lucide-react"
-import { Button } from "@haus/ui/button"
-import { Input } from "@haus/ui/input"
-import { Badge } from "@haus/ui/badge"
-import { Card, CardContent } from "@haus/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@haus/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
-import { Label } from "@haus/ui/label"
-import { Textarea } from "@haus/ui/textarea"
+import { Button } from "@v1/ui/button"
+import { Input } from "@v1/ui/input"
+import { Badge } from "@v1/ui/badge"
+import { Card, CardContent } from "@v1/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@v1/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
+import { Label } from "@v1/ui/label"
+import { Textarea } from "@v1/ui/textarea"
 import type { Agent, Agency } from "@/types/agent"
 
 // Mock agents data

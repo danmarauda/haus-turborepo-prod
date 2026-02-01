@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Button } from "@haus/ui/button"
-import { Card, CardContent } from "@haus/ui/card"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
-import { Slider } from "@haus/ui/slider"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@haus/ui/sheet"
-import { Checkbox } from "@haus/ui/checkbox"
-import { Label } from "@haus/ui/label"
+import { Button } from "@v1/ui/button"
+import { Card, CardContent } from "@v1/ui/card"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
+import { Slider } from "@v1/ui/slider"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@v1/ui/sheet"
+import { Checkbox } from "@v1/ui/checkbox"
+import { Label } from "@v1/ui/label"
 import {
   Search,
   LayoutGrid,

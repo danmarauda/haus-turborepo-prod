@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@haus/ui/card"
-import { Button } from "@haus/ui/button"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@haus/ui/tabs"
-import { Progress } from "@haus/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@haus/ui/avatar"
-import { Switch } from "@haus/ui/switch"
-import { Textarea } from "@haus/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@v1/ui/card"
+import { Button } from "@v1/ui/button"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@v1/ui/tabs"
+import { Progress } from "@v1/ui/progress"
+import { Avatar, AvatarFallback, AvatarImage } from "@v1/ui/avatar"
+import { Switch } from "@v1/ui/switch"
+import { Textarea } from "@v1/ui/textarea"
 import {
   LayoutDashboard,
   FileText,
@@ -42,8 +42,8 @@ import {
   Download,
 } from "lucide-react"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from "recharts"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@haus/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@v1/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
 
 // Mock provider data
 const providerData = {

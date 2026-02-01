@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@haus/ui/card"
-import { Button } from "@haus/ui/button"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@haus/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@v1/ui/card"
+import { Button } from "@v1/ui/button"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@v1/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
 import {
   TrendingUp,
   TrendingDown,

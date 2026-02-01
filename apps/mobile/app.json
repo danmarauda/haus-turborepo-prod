@@ -1,17 +1,16 @@
 {
   "expo": {
-    "name": "Haus",
+    "name": "HAUS Australian Real Estate Platform 2025",
     "slug": "haus-mobile",
     "version": "1.0.0",
-    "scheme": "haus",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
+    "scheme": "haus",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#0A0A0A"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
@@ -21,34 +20,101 @@
       "policy": "appVersion"
     },
     "assetBundlePatterns": ["**/*"],
+    "notification": {
+      "icon": "./assets/images/notification-icon.png",
+      "color": "#0f172a"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.haus.mobile",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow HAUS to access your photos to upload property images",
+        "NSCameraUsageDescription": "Allow HAUS to access your camera to take property photos",
+        "NSMicrophoneUsageDescription": "Allow HAUS to access your microphone for voice features",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "usesIcloudStorage": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0A0A0A"
       },
       "package": "io.haus.mobile",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.VIBRATE",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
-      "expo-secure-store"
+      [
+        "expo-router",
+        {
+          "origin": "https://haus.aliaslabs.com/"
+        }
+      ],
+      "expo-secure-store",
+      "expo-dev-client",
+      "expo-notifications",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-image",
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow HAUS to access your photos to upload property images",
+          "cameraPermission": "Allow HAUS to access your camera to take property photos"
+        }
+      ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      "expo-apple-authentication",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "your-org",
+          "project": "haus-mobile"
+        }
+      ],
+      [
+        "expo-updates",
+        {
+          "username": "haus"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
+    "locales": {
+      "en": "./locales/en.json",
+      "es": "./locales/es.json",
+      "fr": "./locales/fr.json",
+      "pt": "./locales/pt.json"
+    },
     "extra": {
+      "router": {
+        "origin": "https://haus.aliaslabs.com/"
+      },
       "eas": {
         "projectId": "YOUR_EAS_PROJECT_ID"
       }
-    }
+    },
+    "owner": "haus"
   }
 }

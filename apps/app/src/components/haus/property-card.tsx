@@ -3,9 +3,9 @@
 import type React from "react"
 
 import type { Property } from "@/types/property"
-import { Card, CardContent } from "@haus/ui/card"
-import { Badge } from "@haus/ui/badge"
-import { Button } from "@haus/ui/button"
+import { Card, CardContent } from "@v1/ui/card"
+import { Badge } from "@v1/ui/badge"
+import { Button } from "@v1/ui/button"
 import { Heart, Share2, ExternalLink } from "lucide-react"
 import { useState } from "react"
 

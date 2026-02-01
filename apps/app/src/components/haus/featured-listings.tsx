@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@haus/ui/button"
+import { Button } from "@v1/ui/button"
 import { ArrowUpRight } from "lucide-react"
 import { generateMockProperties } from "@/lib/mock-data"
 import { PropertyCard } from "./property-card"

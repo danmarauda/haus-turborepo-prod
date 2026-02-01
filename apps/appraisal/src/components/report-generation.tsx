@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@haus/ui/button";
+import { Button } from "@v1/ui/button";
 import {
   CheckCircle,
   Clock,

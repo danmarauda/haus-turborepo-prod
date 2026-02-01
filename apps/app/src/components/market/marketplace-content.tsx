@@ -5,10 +5,10 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Button } from "@haus/ui/button"
-import { Card, CardContent } from "@haus/ui/card"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
+import { Button } from "@v1/ui/button"
+import { Card, CardContent } from "@v1/ui/card"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
 import {
   Search,
   MapPin,

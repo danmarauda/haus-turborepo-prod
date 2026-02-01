@@ -1,0 +1,40 @@
+---
+# HAUS Mobile - Premium Screen Test
+# Tests subscription UI and pricing cards
+
+appId: com.haus.app
+---
+- launchApp
+
+# Navigate to Premium tab
+- tapOn: "Premium"
+- assertVisible: "HAUS Premium"
+- assertVisible: "Unlock the full property search experience"
+
+# Test Premium Features list
+- assertVisible: "Unlimited Property Searches"
+- assertVisible: "Advanced Map Filters"
+- assertVisible: "AI-Powered Insights"
+- assertVisible: "Real-Time Alerts"
+- assertVisible: "Price History & Analytics"
+- assertVisible: "Exclusive Early Access"
+
+# Test Pricing Cards (for non-subscribed users)
+- assertVisible: "Monthly"
+- assertVisible: "Yearly"
+- assertVisible: "$9.99"
+- assertVisible: "$79.99"
+- assertVisible: "Save 33%"
+
+# Test Subscribe buttons
+- assertVisible: "Subscribe"
+
+# Test Restore Purchases
+- assertVisible: "Restore Purchases"
+- tapOn: "Restore Purchases"
+- waitForAnimationToEnd
+
+# Test Terms
+- assertVisible: "Subscriptions auto-renew"
+- assertVisible: "Terms of Service"
+- assertVisible: "Privacy Policy"

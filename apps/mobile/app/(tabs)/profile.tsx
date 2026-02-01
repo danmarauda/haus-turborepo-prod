@@ -19,7 +19,7 @@ export default function ProfileScreen() {
     { icon: Heart, label: 'Saved Properties', href: '/saved' },
     { icon: Clock, label: 'Viewing History', href: '/history' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
-    { icon: Settings, label: 'Settings', href: '/settings' },
+    { icon: Settings, label: 'Settings', href: '/(tabs)/settings' },
     { icon: HelpCircle, label: 'Help & Support', href: '/support' },
   ];
 

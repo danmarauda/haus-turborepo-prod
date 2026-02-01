@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Search, Store, Building2, User } from 'lucide-react-native';
+import { Home, Search, Store, Building2, User, Settings, Crown, GraduationCap, Heart, MessageSquare, Mic } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -54,6 +54,49 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          title: 'Saved',
+          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="premium"
+        options={{
+          title: 'Premium',
+          tabBarIcon: ({ color, size }) => <Crown size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="(haus)"
+        options={{
+          title: 'Academy',
+          tabBarIcon: ({ color, size }) => <GraduationCap size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+          href: null, // Hide from tab bar but keep accessible
+        }}
+      />
+      <Tabs.Screen
+        name="voice"
+        options={{
+          title: 'Voice',
+          tabBarIcon: ({ color, size }) => <Mic size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="ai-chat"
+        options={{
+          title: 'Chat',
+          tabBarIcon: ({ color, size }) => <MessageSquare size={size} color={color} />,
         }}
       />
     </Tabs>

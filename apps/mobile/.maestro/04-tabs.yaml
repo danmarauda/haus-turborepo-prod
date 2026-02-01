@@ -1,0 +1,46 @@
+---
+# HAUS Mobile - Tabs Navigation Test
+# Tests all main tab screens are accessible
+
+appId: com.haus.app
+---
+- launchApp
+
+# Assume user is already signed in
+# If on onboarding, tap Get Started
+
+# Test Home tab
+- assertVisible: "Home"
+- assertVisible:
+    text: "Featured Properties"
+- tapOn: "Home"
+
+# Test Search tab
+- tapOn: "Search"
+- assertVisible: "Voice Search"
+- assertVisible:
+    text: "Tell us what you're looking for"
+
+# Test Market tab
+- tapOn: "Market"
+- assertVisible: "Market"
+- assertVisible: "Analytics" # or similar
+
+# Test Agency tab
+- tapOn: "Agency"
+- assertVisible: "Agency"
+- assertVisible: "Commercial" # or similar
+
+# Test Profile tab
+- tapOn: "Profile"
+- assertVisible: "Profile"
+- assertVisible: "Settings" # settings link
+
+# Test Settings tab (if exists)
+- tapOn: "Settings"
+- assertVisible: "Settings"
+
+# Test Premium tab
+- tapOn: "Premium"
+- assertVisible: "HAUS Premium"
+- assertVisible: "Unlock the full property search experience"

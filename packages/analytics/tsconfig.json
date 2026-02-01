@@ -3,10 +3,19 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@v1/ui/*": ["../ui/src/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ],
+      "@v1/ui/*": [
+        "../ui/src/*"
+      ]
+    },
+    "strictNullChecks": true
   },
-  "include": ["."],
-  "exclude": ["node_modules"]
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

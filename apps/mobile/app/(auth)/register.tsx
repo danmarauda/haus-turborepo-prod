@@ -3,22 +3,27 @@ import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Scrol
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, User } from 'lucide-react-native';
+import { useAuth } from '@/services/auth';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { signUp, isLoading } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
-    setIsLoading(true);
-    // TODO: Implement Convex auth
-    setTimeout(() => {
-      setIsLoading(false);
-      router.replace('/(tabs)');
-    }, 1000);
+    // Basic validation
+    if (!name || !email || !password) {
+      return;
+    }
+
+    if (password.length < 8) {
+      return;
+    }
+
+    await signUp({ email, password, name });
   };
 
   return (

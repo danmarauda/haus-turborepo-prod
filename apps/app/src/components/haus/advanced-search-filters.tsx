@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@haus/ui/button"
-import { Badge } from "@haus/ui/badge"
-import { Input } from "@haus/ui/input"
-import { Label } from "@haus/ui/label"
-import { Checkbox } from "@haus/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
+import { Button } from "@v1/ui/button"
+import { Badge } from "@v1/ui/badge"
+import { Input } from "@v1/ui/input"
+import { Label } from "@v1/ui/label"
+import { Checkbox } from "@v1/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
 import type { SearchParameters, AmenityType, PropertyFeature, PropertyCondition } from "@/types/property"
 
 interface AdvancedSearchFiltersProps {

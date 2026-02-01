@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@haus/ui/button";
-import { Card, CardContent } from "@haus/ui/card";
+import { Button } from "@v1/ui/button";
+import { Card, CardContent } from "@v1/ui/card";
 import { Search, Building2, Warehouse, TrendingUp, Home } from "lucide-react";
 
 export default function HomePage() {

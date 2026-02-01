@@ -1,0 +1,29 @@
+---
+# HAUS Mobile - Onboarding Flow Test
+# Tests the welcome/onboarding experience for new users
+
+appId: com.haus.app
+---
+- launchApp
+- assertVisible: "Welcome to HAUS"
+- assertVisible: "AI-Native Property Intelligence"
+
+# Swipe through onboarding
+- swipe:
+    direction: LEFT
+- assertVisible: "Voice Search"
+- assertVisible: "Tell us what you're looking for"
+
+- swipe:
+    direction: LEFT
+- assertVisible: "Market Analytics"
+- assertVisible: "Real-time property insights"
+
+- swipe:
+    direction: LEFT
+- assertVisible: "Get Started"
+
+# Tap Get Started to navigate to auth
+- tapOn: "Get Started"
+- assertVisible: "Sign In"
+- assertVisible: "Don't have an account? Sign up"

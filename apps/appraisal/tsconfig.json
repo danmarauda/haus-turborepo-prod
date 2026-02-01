@@ -4,9 +4,12 @@
     "baseUrl": ".",
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "strict": true
+    "strict": true,
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
@@ -16,5 +19,7 @@
     ".next/types/**/*.ts",
     "tailwind.config.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

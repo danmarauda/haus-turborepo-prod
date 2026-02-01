@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@haus/ui/card"
-import { Button } from "@haus/ui/button"
-import { Badge } from "@haus/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@haus/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@haus/ui/avatar"
-import { Progress } from "@haus/ui/progress"
-import { Textarea } from "@haus/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@v1/ui/card"
+import { Button } from "@v1/ui/button"
+import { Badge } from "@v1/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@v1/ui/tabs"
+import { Avatar, AvatarFallback, AvatarImage } from "@v1/ui/avatar"
+import { Progress } from "@v1/ui/progress"
+import { Textarea } from "@v1/ui/textarea"
 import {
   Shield,
   ShieldCheck,

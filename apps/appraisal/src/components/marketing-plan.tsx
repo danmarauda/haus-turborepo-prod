@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@haus/ui/button";
-import { Switch } from "@haus/ui/switch";
+import { Button } from "@v1/ui/button";
+import { Switch } from "@v1/ui/switch";
 import {
   Calendar,
   Camera,

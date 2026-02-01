@@ -1,6 +1,6 @@
 "use client";
 
-import { Slider } from "@haus/ui/slider";
+import { Slider } from "@v1/ui/slider";
 import { DollarSign, Percent, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 

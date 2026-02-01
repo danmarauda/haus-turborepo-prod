@@ -1,0 +1,54 @@
+---
+# HAUS Mobile - Settings Screen Test
+# Tests language switching and theme toggling
+
+appId: com.haus.app
+---
+- launchApp
+
+# Navigate to Settings
+- tapOn: "Settings"
+- assertVisible: "Settings"
+
+# Test Account section
+- assertVisible: "Account"
+- assertVisible: "Email"
+
+# Test Language section
+- assertVisible: "Language"
+- assertVisible: "English"
+- assertVisible: "Español"
+- assertVisible: "Français"
+- assertVisible: "Português"
+
+# Switch language to Spanish
+- tapOn:
+    text: "Español"
+- waitForAnimationToEnd
+
+# Test Appearance section
+- assertVisible: "Appearance"
+- assertVisible: "Dark"
+- assertVisible: "Light"
+- assertVisible: "System"
+
+# Switch theme
+- tapOn:
+    text: "Light"
+- waitForAnimationToEnd
+
+# Test About section
+- assertVisible: "About"
+- assertVisible: "Version"
+
+# Test Sign Out button
+- assertVisible: "Sign Out"
+
+# Verify sign out confirmation appears
+- tapOn: "Sign Out"
+- assertVisible: "Are you sure you want to sign out?"
+- tapOn: "Sign Out" # confirm
+
+# Should return to auth screen
+- assertVisible: "Welcome back"
+- assertVisible: "Sign In"

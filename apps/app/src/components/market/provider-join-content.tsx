@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@haus/ui/button"
-import { Card, CardContent } from "@haus/ui/card"
-import { Input } from "@haus/ui/input"
-import { Label } from "@haus/ui/label"
-import { Textarea } from "@haus/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@haus/ui/select"
-import { Checkbox } from "@haus/ui/checkbox"
+import { Button } from "@v1/ui/button"
+import { Card, CardContent } from "@v1/ui/card"
+import { Input } from "@v1/ui/input"
+import { Label } from "@v1/ui/label"
+import { Textarea } from "@v1/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@v1/ui/select"
+import { Checkbox } from "@v1/ui/checkbox"
 import {
   Shield,
   CheckCircle2,

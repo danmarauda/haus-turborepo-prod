@@ -1,4 +1,4 @@
-import baseConfig from "@haus/ui/tailwind.config";
+import baseConfig from "@v1/ui/tailwind.config";
 import type { Config } from "tailwindcss";
 
 const config: Config = {

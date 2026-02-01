@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@haus/ui/button";
+import { Button } from "@v1/ui/button";
 import {
   AlignLeft,
   Download,
