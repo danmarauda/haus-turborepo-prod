@@ -8,19 +8,36 @@
  * @module
  */
 
+import type * as academy from "../academy.js";
 import type * as ai_chat from "../ai/chat.js";
 import type * as auth from "../auth.js";
+import type * as compassListings from "../compassListings.js";
 import type * as cortex from "../cortex.js";
 import type * as cortexSchema from "../cortexSchema.js";
+import type * as dudReports from "../dudReports.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
+import type * as graphSync from "../graphSync.js";
 import type * as http from "../http.js";
 import type * as init from "../init.js";
+import type * as marketCategories from "../marketCategories.js";
+import type * as payments_index from "../payments/index.js";
+import type * as payments_stripe from "../payments/stripe.js";
+import type * as propertyListings from "../propertyListings.js";
+import type * as propertySync from "../propertySync.js";
 import type * as propertyUploads from "../propertyUploads.js";
+import type * as providers from "../providers.js";
+import type * as rateLimit from "../rateLimit.js";
+import type * as revenuecatWebhooks from "../revenuecatWebhooks.js";
+import type * as schema_additions from "../schema_additions.js";
 import type * as storage from "../storage.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as tenders from "../tenders.js";
+import type * as unifiedSubscriptions from "../unifiedSubscriptions.js";
+import type * as userProgress from "../userProgress.js";
 import type * as users from "../users.js";
 import type * as utils_validators from "../utils/validators.js";
+import type * as vectorSearch from "../vectorSearch.js";
 import type * as web from "../web.js";
 
 import type {
@@ -30,19 +47,36 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  academy: typeof academy;
   "ai/chat": typeof ai_chat;
   auth: typeof auth;
+  compassListings: typeof compassListings;
   cortex: typeof cortex;
   cortexSchema: typeof cortexSchema;
+  dudReports: typeof dudReports;
   "email/index": typeof email_index;
   env: typeof env;
+  graphSync: typeof graphSync;
   http: typeof http;
   init: typeof init;
+  marketCategories: typeof marketCategories;
+  "payments/index": typeof payments_index;
+  "payments/stripe": typeof payments_stripe;
+  propertyListings: typeof propertyListings;
+  propertySync: typeof propertySync;
   propertyUploads: typeof propertyUploads;
+  providers: typeof providers;
+  rateLimit: typeof rateLimit;
+  revenuecatWebhooks: typeof revenuecatWebhooks;
+  schema_additions: typeof schema_additions;
   storage: typeof storage;
   subscriptions: typeof subscriptions;
+  tenders: typeof tenders;
+  unifiedSubscriptions: typeof unifiedSubscriptions;
+  userProgress: typeof userProgress;
   users: typeof users;
   "utils/validators": typeof utils_validators;
+  vectorSearch: typeof vectorSearch;
   web: typeof web;
 }>;
 

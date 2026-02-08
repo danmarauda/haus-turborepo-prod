@@ -1,259 +1,183 @@
-// JWT-based authentication for React Native with Convex integration
+// Convex Auth integration for React Native with Google OAuth
 import React, {
   createContext,
   type PropsWithChildren,
-  useCallback,
   useContext,
   useEffect,
   useState,
   useMemo,
 } from 'react';
-import { useRouter, useRootNavigationState } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+import { useRouter } from 'expo-router';
 import { toast } from 'sonner-native';
 import Purchases from 'react-native-purchases';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
+import { Platform } from 'react-native';
 
-import { createToken, verifyToken, isTokenExpired } from './token';
-import { convex } from '@/lib/convex';
-import { api } from '@/convex/_generated/api';
+import { useConvexAuth, useMutation, useQuery } from 'convex/react';
+import { useAuthActions } from '@convex-dev/auth/react';
+import { api } from '@v1/backend/convex/_generated/api';
 
-/**
- * Links RevenueCat account ID to the authenticated user
- * This should be called after sign-in/sign-up to sync subscription status
- */
-async function linkRevenueCatAccount(userId: string): Promise<void> {
-  try {
-    // Get the RevenueCat app user ID
-    const customerInfo = await Purchases.getCustomerInfo();
-    const revenueCatId = customerInfo.originalAppUserId;
-
-    if (revenueCatId) {
-      await convex.mutation(api.users.linkRevenueCatAccount, {
-        revenueCatId,
-      });
-      console.log('RevenueCat account linked:', revenueCatId);
-    }
-  } catch (error) {
-    console.error('Failed to link RevenueCat account:', error);
-    // Don't throw - linking failure shouldn't block auth
-  }
-}
+// Complete any pending WebBrowser sessions
+WebBrowser.maybeCompleteAuthSession();
 
 type AuthState = {
   isAuthenticated: boolean;
-  token?: string;
-  userId?: string;
-  email?: string;
-};
-
-type SignInProps = {
-  email: string;
-  password: string;
-};
-
-type SignUpProps = {
-  email: string;
-  password: string;
-  name?: string;
-};
-
-type AuthContextState = AuthState & {
   isLoading: boolean;
 };
 
 type AuthContextActions = {
-  signIn: (props: SignInProps) => Promise<void>;
-  signUp: (props: SignUpProps) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
-const AuthStateContext = createContext<AuthContextState | null>(null);
-const AuthActionsContext = createContext<AuthContextActions | null>(null);
+type AuthContextValue = AuthState & AuthContextActions & {
+  user: typeof api.users.getUser._returnType | undefined | null;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function useAuth() {
-  const state = useContext(AuthStateContext);
-  const actions = useContext(AuthActionsContext);
-
+  const context = useContext(AuthContext);
+  
   if (process.env.NODE_ENV !== 'production') {
-    if (!state || !actions) {
+    if (!context) {
       throw new Error('useAuth must be used within an AuthProvider');
     }
   }
-
-  return { ...state, ...actions };
+  
+  return context!;
 }
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    token: undefined,
-    userId: undefined,
-    email: undefined,
-  });
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const navigationState = useRootNavigationState();
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Convex Auth hooks
+  const { isLoading: isConvexLoading, isAuthenticated } = useConvexAuth();
+  const { signIn, signOut } = useAuthActions();
+  
+  // Convex mutations
+  const linkRevenueCatMutation = useMutation(api.users.linkRevenueCatAccount);
+  
+  // Get user data when authenticated
+  const user = useQuery(
+    api.users.getUser,
+    isAuthenticated ? {} : 'skip'
+  );
 
-  // Load auth state on mount
-  useEffect(() => {
-    const loadAuthState = async () => {
-      try {
-        const storedToken = await SecureStore.getItemAsync('auth_token');
-        const storedUserId = await SecureStore.getItemAsync('user_id');
-        const storedEmail = await SecureStore.getItemAsync('user_email');
+  // Create redirect URI for OAuth
+  const redirectTo = useMemo(() => makeRedirectUri({
+    scheme: 'haus',
+    path: 'auth/callback',
+  }), []);
 
-        if (storedToken && !isTokenExpired(storedToken)) {
-          setAuthState({
-            isAuthenticated: true,
-            token: storedToken,
-            userId: storedUserId || undefined,
-            email: storedEmail || undefined,
-          });
-        } else {
-          // Clear expired tokens
-          await SecureStore.deleteItemAsync('auth_token');
-        }
-      } catch (error) {
-        console.error('Error loading auth state:', error);
-      } finally {
-        setIsLoading(false);
+  // Link RevenueCat after successful authentication
+  const linkRevenueCat = async () => {
+    try {
+      const customerInfo = await Purchases.getCustomerInfo();
+      const revenueCatId = customerInfo.originalAppUserId;
+
+      if (revenueCatId) {
+        await linkRevenueCatMutation({ revenueCatId });
+        console.log('RevenueCat account linked:', revenueCatId);
       }
-    };
+    } catch (error) {
+      console.error('Failed to link RevenueCat account:', error);
+      // Don't throw - linking failure shouldn't block auth
+    }
+  };
 
-    loadAuthState();
-  }, []);
+  // Handle authentication state changes
+  useEffect(() => {
+    if (!isConvexLoading) {
+      setIsInitialized(true);
+      
+      // If user just became authenticated, link RevenueCat
+      if (isAuthenticated) {
+        linkRevenueCat();
+      }
+    }
+  }, [isConvexLoading, isAuthenticated]);
 
   const actions = useMemo(
     () => ({
-      signIn: async ({ email, password }: SignInProps) => {
-        setIsLoading(true);
+      signInWithGoogle: async () => {
         try {
-          // Call Convex authentication function
-          const result = await convex.mutation(api.auth.signIn, {
-            email,
-            password,
-          });
-
-          if (!result) {
-            throw new Error('Authentication failed');
+          // For web, the OAuth flow happens in the same window
+          if (Platform.OS === 'web') {
+            await signIn('google', { redirectTo });
+            return;
           }
 
-          // Create JWT token
-          const token = await createToken({
-            userId: result.userId,
-            email: result.email,
-          });
+          // For native platforms, we use the expo-web-browser flow
+          // Step 1: Get the OAuth URL from Convex Auth
+          const { redirect } = await signIn('google', { redirectTo });
+          
+          if (!redirect) {
+            throw new Error('Failed to get OAuth redirect URL');
+          }
 
-          // Store securely
-          await SecureStore.setItemAsync('auth_token', token);
-          await SecureStore.setItemAsync('user_id', result.userId);
-          await SecureStore.setItemAsync('user_email', result.email);
+          // Step 2: Open the OAuth URL in a web browser
+          const result = await WebBrowser.openAuthSessionAsync(
+            redirect.toString(),
+            redirectTo
+          );
 
-          setAuthState({
-            isAuthenticated: true,
-            token,
-            userId: result.userId,
-            email: result.email,
-          });
-
-          // Link RevenueCat account after sign-in
-          await linkRevenueCatAccount(result.userId);
-
-          toast.success('Welcome back!');
-          router.replace('/(tabs)');
+          // Step 3: Handle the result
+          if (result.type === 'success') {
+            const { url } = result;
+            const code = new URL(url).searchParams.get('code');
+            
+            if (code) {
+              // Complete the OAuth flow with the code
+              await signIn('google', { code, redirectTo });
+              toast.success('Welcome!');
+              router.replace('/(tabs)/' as any);
+            } else {
+              throw new Error('No authorization code received');
+            }
+          } else if (result.type === 'cancel') {
+            console.log('User cancelled OAuth flow');
+          } else {
+            console.log('OAuth flow result:', result);
+          }
         } catch (error) {
           console.error('Sign in error:', error);
-          toast.error(error instanceof Error ? error.message : 'Invalid credentials');
-        } finally {
-          setIsLoading(false);
-        }
-      },
-
-      signUp: async ({ email, password, name }: SignUpProps) => {
-        setIsLoading(true);
-        try {
-          // Call Convex registration function
-          const result = await convex.mutation(api.auth.signUp, {
-            email,
-            password,
-            name,
-          });
-
-          if (!result) {
-            throw new Error('Registration failed');
-          }
-
-          // Create JWT token
-          const token = await createToken({
-            userId: result.userId,
-            email: result.email,
-          });
-
-          // Store securely
-          await SecureStore.setItemAsync('auth_token', token);
-          await SecureStore.setItemAsync('user_id', result.userId);
-          await SecureStore.setItemAsync('user_email', result.email);
-
-          setAuthState({
-            isAuthenticated: true,
-            token,
-            userId: result.userId,
-            email: result.email,
-          });
-
-          // Link RevenueCat account after sign-up
-          await linkRevenueCatAccount(result.userId);
-
-          toast.success('Account created successfully!');
-          router.replace('/(tabs)');
-        } catch (error) {
-          console.error('Sign up error:', error);
-          toast.error(error instanceof Error ? error.message : 'Failed to create account');
-        } finally {
-          setIsLoading(false);
+          toast.error(error instanceof Error ? error.message : 'Sign in failed');
+          throw error;
         }
       },
 
       signOut: async () => {
-        setIsLoading(true);
         try {
-          await SecureStore.deleteItemAsync('auth_token');
-          await SecureStore.deleteItemAsync('user_id');
-          await SecureStore.deleteItemAsync('user_email');
-
-          setAuthState({
-            isAuthenticated: false,
-            token: undefined,
-            userId: undefined,
-            email: undefined,
-          });
-
+          // Use Convex Auth signOut function
+          await signOut();
+          
           toast.success('Signed out successfully');
-          router.replace('/(auth)');
+          router.replace('/(auth)/login' as any);
         } catch (error) {
           console.error('Sign out error:', error);
-        } finally {
-          setIsLoading(false);
+          toast.error('Failed to sign out');
         }
       },
     }),
-    [router]
+    [router, signIn, signOut, redirectTo]
   );
 
-  const state = useMemo(
+  const value = useMemo(
     () => ({
-      ...authState,
-      isLoading,
+      isAuthenticated,
+      isLoading: isConvexLoading || !isInitialized,
+      user,
+      ...actions,
     }),
-    [authState, isLoading]
+    [isAuthenticated, isConvexLoading, isInitialized, user, actions]
   );
 
   return (
-    <AuthStateContext.Provider value={state}>
-      <AuthActionsContext.Provider value={actions}>
-        {children}
-      </AuthActionsContext.Provider>
-    </AuthStateContext.Provider>
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
   );
 };

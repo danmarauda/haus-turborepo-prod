@@ -1,11 +1,21 @@
 /**
  * Providers Index
- * 
+ *
  * Central export for all context providers
  */
 
-export { FavoritesProvider, useFavorites } from './FavoritesProvider';
-export type { FavoritesContextType } from './FavoritesProvider';
+export { FavoritesProvider, useFavorites } from "./FavoritesProvider";
+export type { FavoritesContextType } from "./FavoritesProvider";
 
-export { RealtimeFiltersProvider, useRealtimeFilters } from './RealtimeFiltersProvider';
-export type { Filters, Presence, RealtimeFiltersContextType } from './RealtimeFiltersProvider';
+export {
+  RealtimeFiltersProvider,
+  useRealtimeFilters,
+} from "./RealtimeFiltersProvider";
+export type {
+  Filters,
+  Presence,
+  RealtimeFiltersContextType,
+} from "./RealtimeFiltersProvider";
+
+export { ThemeProvider, useTheme } from "./ThemeProvider";
+export type { ThemeType } from "./ThemeProvider";

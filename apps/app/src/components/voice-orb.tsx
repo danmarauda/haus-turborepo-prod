@@ -13,7 +13,7 @@ interface VoiceOrbProps {
 export function VoiceOrb({ isListening, isProcessing, audioLevel = 0, className }: VoiceOrbProps) {
   const [pulseIntensity, setPulseIntensity] = useState(0)
   const [waveformBars, setWaveformBars] = useState<number[]>(Array(8).fill(0))
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     if (isListening) {

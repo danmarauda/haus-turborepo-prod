@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { api } from "@v1/backend/convex/_generated/api";
 import * as validators from "@v1/backend/convex/utils/validators";
 import { Button } from "@v1/ui/button";
@@ -20,7 +19,6 @@ export default function OnboardingUsername() {
   const { pending } = useFormStatus();
 
   const form = useForm({
-    validatorAdapter: zodValidator(),
     defaultValues: {
       username: "",
     },
@@ -93,9 +91,9 @@ export default function OnboardingUsername() {
         </div>
 
         <div className="flex flex-col">
-          {form.state.fieldMeta.username?.errors.length > 0 && (
+          {(form.state.fieldMeta.username?.errors?.length ?? 0) > 0 && (
             <span className="mb-2 text-sm text-destructive dark:text-destructive-foreground">
-              {form.state.fieldMeta.username?.errors.join(" ")}
+              {form.state.fieldMeta.username?.errors?.join(" ") ?? ""}
             </span>
           )}
         </div>

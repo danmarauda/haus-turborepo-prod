@@ -1,0 +1,29 @@
+# Neo4j for HAUS Knowledge Graph
+# Property ↔ Suburb ↔ Agent ↔ Buyer relationships
+# Usage: docker-compose -f docker-compose.neo4j.yml up -d
+
+services:
+  neo4j:
+    image: neo4j:5.25-community
+    container_name: haus-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      NEO4J_AUTH: neo4j:haus-dev-password
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_memory_heap_max__size: 512M
+      NEO4J_dbms_memory_pagecache_size: 512M
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "haus-dev-password", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+  neo4j_logs:

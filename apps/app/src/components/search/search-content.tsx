@@ -29,11 +29,15 @@ import {
   RotateCcw,
   Save,
   Loader2,
+  RefreshCw,
+  CloudDownload,
 } from "lucide-react"
 import { PropertyCard } from "@/components/property-card"
 import { PropertyDetailModal } from "@/components/property-detail-modal"
 import { VoiceCopilotModal } from "@/components/voice-copilot-modal"
-import { generateMockProperties } from "@/lib/mock-data"
+import { usePropertySync } from "@/hooks/use-property-sync"
+import { useQuery } from "convex/react"
+import { api } from "@v1/backend/convex/_generated/api"
 import type { Property, SearchParameters, VoiceSearchResult } from "@/types/property"
 
 // Property type options
@@ -124,22 +128,89 @@ export function SearchContent() {
   const [savedSearches, setSavedSearches] = useState<string[]>([])
   const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set())
 
-  // Load initial data
+  // Property sync hook
+  const { syncProperties, isSyncing, result: syncResult } = usePropertySync()
+
+  // Convex query for property listings
+  const convexListings = useQuery(api.propertyListings.search, {
+    suburb: location?.split(",")?.[0]?.trim(),
+    state: location?.split(",")?.[1]?.trim(),
+    minPrice: priceRange[0],
+    maxPrice: priceRange[1],
+    minBedrooms: bedrooms === "any" ? undefined : Number.parseInt(bedrooms, 10),
+    propertyType: propertyType.length === 1 ? (propertyType[0] as any) : undefined,
+    limit: 50,
+  })
+
+  // Load properties function - needs convexListings
+  const loadProperties = useCallback(() => {
+    setIsLoading(true)
+
+    // Map Convex listings to frontend Property type
+    if (convexListings && convexListings.length > 0) {
+      const mappedProperties: Property[] = convexListings.map((listing: any) => ({
+        id: listing._id.toString(),
+        title: listing.headline || `${listing.bedrooms || 0} bed ${listing.propertyType} in ${listing.suburb}`,
+        price: listing.price || 0,
+        location: `${listing.address}, ${listing.suburb} ${listing.state} ${listing.postcode}`,
+        bedrooms: listing.bedrooms || 0,
+        bathrooms: listing.bathrooms || 0,
+        squareFootage: listing.buildingSize || listing.landSize || 0,
+        propertyType: listing.propertyType,
+        listingType: (listing.status === "active" ? "for-sale" : listing.status) as any,
+        imageUrl: listing.mainImage || listing.images?.[0] || "/placeholder-property.jpg",
+        amenities: (listing.features || []) as any[],
+        description: listing.description || "",
+        yearBuilt: undefined,
+        lotSize: listing.landSize,
+        coordinates: listing.latitude && listing.longitude
+          ? { lat: listing.latitude, lng: listing.longitude }
+          : undefined,
+        agent: listing.agentName
+          ? {
+              name: listing.agentName,
+              phone: listing.agentPhone || "",
+              email: listing.agentEmail || "",
+              agency: listing.agencyName || "",
+            }
+          : undefined,
+      }))
+
+      setProperties(mappedProperties)
+      setTotalResults(mappedProperties.length)
+    } else {
+      setProperties([])
+      setTotalResults(0)
+    }
+
+    setIsLoading(false)
+  }, [convexListings])
+
+  // Load initial data and update when Convex results change
   useEffect(() => {
-    loadProperties()
     loadSavedData()
   }, [])
 
-  const loadProperties = useCallback(() => {
-    setIsLoading(true)
-    // Simulate API call with filters
-    setTimeout(() => {
-      const mockProperties = generateMockProperties({}, 24)
-      setProperties(mockProperties)
-      setTotalResults(mockProperties.length + Math.floor(Math.random() * 200))
-      setIsLoading(false)
-    }, 800)
-  }, [])
+  // Update properties when Convex results change
+  useEffect(() => {
+    if (convexListings !== undefined) {
+      loadProperties()
+    }
+  }, [convexListings, loadProperties])
+
+  // Handle property sync
+  const handleSyncProperties = useCallback(async () => {
+    const suburb = location?.split(",")?.[0]?.trim()
+    const state = location?.split(",")?.[1]?.trim()
+
+    await syncProperties({
+      suburb,
+      state,
+      query: searchQuery || undefined,
+      maxPages: 2,
+      listingType: listingType === "for-sale" ? "buy" : listingType === "for-rent" ? "rent" : undefined,
+    })
+  }, [location, searchQuery, listingType, syncProperties])
 
   const loadSavedData = () => {
     const saved = localStorage.getItem("haus_saved_properties")
@@ -329,6 +400,35 @@ export function SearchContent() {
               >
                 Search
               </Button>
+
+              {/* Sync Properties Button */}
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-14 px-6 rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 gap-2"
+                onClick={handleSyncProperties}
+                disabled={isSyncing}
+              >
+                {isSyncing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <CloudDownload className="w-4 h-4" />
+                    Sync Properties
+                  </>
+                )}
+              </Button>
+
+              {/* Sync result indicator */}
+              {syncResult && syncResult.success && (
+                <Badge className="h-14 px-4 rounded-2xl bg-green-500/20 text-green-500 border-green-500/30">
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  Synced: {syncResult.created} new, {syncResult.updated} updated
+                </Badge>
+              )}
             </div>
 
             {/* Quick Filter Presets */}

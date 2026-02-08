@@ -1,0 +1,76 @@
+{
+  "app": {
+    "name": "HAUS",
+    "tagline": "Inteligencia de Propiedades con IA"
+  },
+  "tabs": {
+    "home": "Inicio",
+    "search": "Buscar",
+    "compass": "Brújula",
+    "saved": "Guardados",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "noAccount": "¿No tienes una cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "signInError": "Correo o contraseña inválidos",
+    "signUpError": "Error al crear cuenta",
+    "signInSuccess": "¡Bienvenido de vuelta!",
+    "signUpSuccess": "Cuenta creada exitosamente"
+  },
+  "search": {
+    "title": "Búsqueda de Propiedades",
+    "placeholder": "Describe tu propiedad ideal...",
+    "listening": "Escuchando...",
+    "processing": "Procesando...",
+    "filters": "Filtros",
+    "results": "Resultados",
+    "noResults": "No se encontraron propiedades",
+    "tryDifferent": "Prueba con otros términos de búsqueda"
+  },
+  "property": {
+    "title": "Detalles de la Propiedad",
+    "price": "Precio",
+    "bedrooms": "Habitaciones",
+    "bathrooms": "Baños",
+    "parking": "Estacionamiento",
+    "landSize": "Tamaño del Terreno",
+    "description": "Descripción",
+    "features": "Características",
+    "location": "Ubicación",
+    "save": "Guardar Propiedad",
+    "unsave": "Quitar",
+    "contact": "Contactar Agente",
+    "tour": "Agendar Visita",
+    "saved": "Propiedad guardada",
+    "unsaved": "Propiedad eliminada"
+  },
+  "voice": {
+    "tapToSpeak": "Toca para hablar",
+    "listening": "Escuchando...",
+    "processing": "Procesando...",
+    "error": "No se pudo entender. Por favor intenta de nuevo.",
+    "microphonePermission": "Se requiere permiso de micrófono para la búsqueda por voz."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo"
+  }
+}

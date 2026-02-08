@@ -1,0 +1,74 @@
+{
+  "session_id": "f2d7ba99-8773-463c-bbf1-8c92619f7796",
+  "phase": "PREFLIGHT",
+  "round": 1,
+  "timestamp": "2026-02-04T06:19:18.540226+00:00",
+  "vectors": {
+    "engagement": 0.9,
+    "know": 0.6,
+    "do": 0.7,
+    "context": 0.5,
+    "clarity": 0.6,
+    "coherence": 0.6,
+    "signal": 0.5,
+    "density": 0.4,
+    "state": 0.6,
+    "change": 0.5,
+    "completion": 0.1,
+    "impact": 0.5,
+    "uncertainty": 0.6
+  },
+  "overall_confidence": 0.6,
+  "meta": {
+    "reasoning": "Mobile Agent starting HAUS migration. Moderate uncertainty due to unknown state of mobile codebase vs web features. Need to explore both target and source directories to understand gaps.",
+    "prompt": "Mobile Agent starting HAUS migration. Moderate uncertainty due to unknown state of mobile codebase vs web features. Need to explore both target and source directories to understand gaps.",
+    "git_commit_sha": "6343e75e22bd2e37e89351b7a53c3fca8a529d24",
+    "git_notes_ref": "empirica/session/f2d7ba99-8773-463c-bbf1-8c92619f7796/PREFLIGHT/1"
+  },
+  "epistemic_tags": {},
+  "git_state": {
+    "head_commit": "dd0c820a2f17441442e3301d941f94336382920d",
+    "commits_since_last_checkpoint": [],
+    "uncommitted_changes": {
+      "files_modified": [
+        "MIGRATION_ANALYSIS.md",
+        "apps/app/next.config.mjs",
+        "apps/app/src/app/[locale]/(dashboard)/_components/navigation.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/billing/page.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/layout.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/page.tsx",
+        "apps/app/src/app/[locale]/onboarding/page.tsx",
+        "apps/app/src/components/haus/voice-copilot-modal.tsx",
+        "apps/app/src/components/haus/voice-orb.tsx",
+        "apps/app/src/components/search/search-content.tsx",
+        "apps/app/src/components/voice-orb.tsx",
+        "apps/app/tsconfig.json",
+        "apps/mobile/app/(tabs)/voice.tsx",
+        "apps/mobile/services/auth/token.ts",
+        "bun.lock",
+        "packages/backend/convex/_generated/api.d.ts",
+        "packages/backend/convex/env.ts",
+        "packages/backend/convex/http.ts",
+        "packages/backend/convex/schema.ts",
+        "packages/backend/convex/users.ts",
+        "packages/backend/package.json",
+        "packages/ui/src/components/checkbox.tsx",
+        "packages/ui/src/components/label.tsx",
+        "packages/ui/src/components/progress.tsx",
+        "packages/ui/src/components/radio-group.tsx",
+        "packages/ui/src/components/slider.tsx",
+        "packages/ui/src/components/tabs.tsx",
+        "packages/ui/src/globals.css",
+        "packages/ui/tailwind.config.ts",
+        "tsconfig.json"
+      ],
+      "files_added": [],
+      "files_deleted": [
+        "packages/backend/lib/cortex/hooks.ts"
+      ],
+      "diff_stat": "MIGRATION_ANALYSIS.md                              | 1251 +++++++-------------\n apps/app/next.config.mjs                           |    6 +-\n .../(dashboard)/_components/navigation.tsx         |    4 +-\n .../[locale]/(dashboard)/settings/billing/page.tsx |    4 +-\n .../app/[locale]/(dashboard)/settings/layout.tsx   |    7 +-\n .../src/app/[locale]/(dashboard)/settings/page.tsx |    6 +-\n apps/app/src/app/[locale]/onboarding/page.tsx      |    6 +-\n .../src/components/haus/voice-copilot-modal.tsx    |    2 +-\n apps/app/src/components/haus/voice-orb.tsx         |    2 +-\n apps/app/src/components/search/search-content.tsx  |  126 +-\n apps/app/src/components/voice-orb.tsx              |    2 +-\n apps/app/tsconfig.json                             |   30 +-\n apps/mobile/app/(tabs)/voice.tsx                   |    4 +-\n apps/mobile/services/auth/token.ts                 |    7 +-\n bun.lock                                           |  120 +-\n packages/backend/convex/_generated/api.d.ts        |   16 +\n packages/backend/convex/env.ts                     |   12 +\n packages/backend/convex/http.ts                    |  296 ++++-\n packages/backend/convex/schema.ts                  |  334 +++++-\n packages/backend/convex/users.ts                   |   21 +\n packages/backend/lib/cortex/hooks.ts               |  483 --------\n packages/backend/package.json                      |    4 +-\n packages/ui/src/components/checkbox.tsx            |   13 +-\n packages/ui/src/components/label.tsx               |   11 +-\n packages/ui/src/components/progress.tsx            |   15 +-\n packages/ui/src/components/radio-group.tsx         |   32 +-\n packages/ui/src/components/slider.tsx              |   15 +-\n packages/ui/src/components/tabs.tsx                |   63 +-\n packages/ui/src/globals.css                        |    5 +-\n packages/ui/tailwind.config.ts                     |    2 +-\n tsconfig.json                                      |   34 +-\n 31 files changed, 1519 insertions(+), 1414 deletions(-)"
+    }
+  },
+  "learning_delta": {},
+  "token_count": 354
+}

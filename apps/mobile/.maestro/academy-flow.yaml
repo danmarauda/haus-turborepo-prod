@@ -1,0 +1,27 @@
+# MAESTRO FLOW: HAUS Academy Navigation
+# Tests the HAUS Academy section navigation
+
+appId: com.aliaslabs.haus
+---
+- launchApp
+- waitForAnimationToEnd
+- tryTo:
+    tapOn: "HAUS Voice Agent"
+# Scroll to find Academy section
+- scroll
+- assertVisible: "HAUS Academy"
+# Test "Today on HAUS" card
+- tapOn:
+    id: "hearth-today-card"
+- waitForAnimationToEnd
+- assertVisible: "Academy"
+# Go back
+- pressBack
+# Test stats section
+- assertVisible: "HAUS in Numbers"
+- assertVisible:
+    text: "50K+"
+- assertVisible:
+    text: "100+"
+- assertVisible:
+    text: "98%"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import { Link } from 'expo-router';
 import { Home } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeContext';

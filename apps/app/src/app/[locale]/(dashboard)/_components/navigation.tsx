@@ -47,10 +47,10 @@ export function Navigation({
   const products = usePreloadedQuery(preloadedProducts);
 
   const monthlyProProduct = products?.find(
-    (product) => product.recurringInterval === "month",
+    (product: any) => product.recurringInterval === "month",
   );
   const yearlyProProduct = products?.find(
-    (product) => product.recurringInterval === "year",
+    (product: any) => product.recurringInterval === "year",
   );
 
   if (!user) {

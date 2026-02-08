@@ -1,170 +1,143 @@
-export interface SearchParameters {
-  location?: string
-  propertyType?: "house" | "apartment" | "condo" | "townhouse" | "loft" | "studio" | "penthouse" | "duplex"
-  listingType?: "for-sale" | "for-rent" | "sold" | "off-market"
-  priceRange?: {
-    min?: number
-    max?: number
-  }
-  bedrooms?: number
-  bathrooms?: number
-  squareFootage?: {
-    min?: number
-    max?: number
-  }
-  lotSize?: {
-    min?: number
-    max?: number
-  }
-  yearBuilt?: {
-    min?: number
-    max?: number
-  }
-  amenities?: AmenityType[]
-  features?: PropertyFeature[]
-  schoolDistrict?: string
-  walkScore?: number
-  transitScore?: number
-  hoaFees?: {
-    min?: number
-    max?: number
-  }
-  propertyTax?: {
-    min?: number
-    max?: number
-  }
-  condition?: PropertyCondition
-  occupancyStatus?: "owner-occupied" | "tenant-occupied" | "vacant"
-  virtualTourAvailable?: boolean
-  openHouseScheduled?: boolean
-  newListing?: boolean // Listed within last 7 days
-  priceReduced?: boolean
+/**
+ * Property Types for HAUS Web App (@v1/app)
+ *
+ * Re-exports shared types from @v1/shared/types/property
+ * Add web-specific extensions here.
+ *
+ * @deprecated Import from @v1/shared/types/property directly for new code
+ */
+
+// Re-export all shared types
+export {
+  // Core types
+  PROPERTY_TYPES,
+  type PropertyType,
+  isPropertyType,
+  
+  // Type metadata
+  PROPERTY_TYPE_CONFIGS,
+  type PropertyTypeConfig,
+  getPropertyTypeConfig,
+  getAllPropertyTypes,
+  getPropertyTypesByCategory,
+  getPropertyTypeLabel,
+  getPropertyTypeIcon,
+  findPropertyTypeByAlias,
+  normalizePropertyType,
+  
+  // Listing types
+  LISTING_TYPES,
+  LISTING_TYPE_CONFIGS,
+  type ListingType,
+  
+  // Core interfaces
+  type Location,
+  type PropertyFeatures,
+  type PropertyMedia,
+  type PropertyPrice,
+  type Agent,
+  type Property,
+  
+  // Search types
+  type PropertySearchParams,
+  type VoiceSearchResult,
+  
+  // Backend types
+  CONVEX_PROPERTY_TYPE_LITERALS,
+  CONVEX_PROPERTY_STATUS_LITERALS,
+  type ConvexPropertyType,
+  type ConvexPropertyStatus,
+  
+  // Utilities
+  toStandardPropertyType,
+  toPropertySummary,
+  formatPropertyDisplay,
+  formatPropertyPrice,
+  
+  // Constants
+  AUSTRALIAN_STATES,
+  NZ_REGIONS,
+  SEARCH_RADIUS_OPTIONS,
+  DEFAULT_SEARCH_RADIUS,
+  DEFAULT_PAGE_SIZE,
+  MAX_SEARCH_RESULTS,
+  
+  // Legacy types (for backward compatibility)
+  type AmenityType,
+  type PropertyFeature,
+  type PropertyCondition,
+  AMENITY_TYPES,
+  PROPERTY_FEATURES,
+} from "@v1/shared/types/property";
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WEB-SPECIFIC EXTENSIONS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+import type { Property as SharedProperty, PropertySearchParams } from "@v1/shared/types/property";
+
+/**
+ * Extended property interface for web app
+ * Includes web-specific fields like SEO metadata
+ */
+export interface WebProperty extends SharedProperty {
+  /** SEO-friendly slug for URLs */
+  slug?: string;
+  /** Meta description for SEO */
+  metaDescription?: string;
+  /** Open Graph image URL */
+  ogImage?: string;
+  /** Canonical URL */
+  canonicalUrl?: string;
+  /** Is this property featured on homepage? */
+  isFeatured?: boolean;
+  /** View count (for analytics) */
+  viewCount?: number;
 }
 
-export type AmenityType =
-  | "pool"
-  | "spa"
-  | "gym"
-  | "tennis-court"
-  | "basketball-court"
-  | "garage"
-  | "carport"
-  | "covered-parking"
-  | "guest-parking"
-  | "garden"
-  | "backyard"
-  | "front-yard"
-  | "balcony"
-  | "terrace"
-  | "deck"
-  | "fireplace"
-  | "air-conditioning"
-  | "heating"
-  | "dishwasher"
-  | "laundry"
-  | "walk-in-closet"
-  | "built-in-wardrobes"
-  | "study"
-  | "office"
-  | "security-system"
-  | "intercom"
-  | "elevator"
-  | "concierge"
-  | "pet-friendly"
-  | "furnished"
-  | "unfurnished"
-  | "solar-panels"
-  | "energy-efficient"
-  | "smart-home"
-
-export type PropertyFeature =
-  | "corner-lot"
-  | "cul-de-sac"
-  | "waterfront"
-  | "mountain-view"
-  | "city-view"
-  | "gated-community"
-  | "new-construction"
-  | "recently-renovated"
-  | "historic"
-  | "architectural-significance"
-  | "eco-friendly"
-  | "wheelchair-accessible"
-  | "single-story"
-  | "multi-story"
-  | "basement"
-  | "attic"
-  | "wine-cellar"
-  | "home-theater"
-
-export type PropertyCondition = "excellent" | "good" | "fair" | "needs-work" | "fixer-upper"
-
-export interface Property {
-  id: string
-  title: string
-  price: number
-  location: string
-  bedrooms: number
-  bathrooms: number
-  squareFootage: number
-  propertyType: string
-  listingType: "for-sale" | "for-rent" | "sold" | "off-market"
-  imageUrl: string
-  amenities: AmenityType[]
-  description: string
-  yearBuilt?: number
-  lotSize?: number
-  features?: PropertyFeature[]
-  condition?: PropertyCondition
-  hoaFees?: number
-  propertyTax?: number
-  schoolDistrict?: string
-  walkScore?: number
-  transitScore?: number
-  occupancyStatus?: "owner-occupied" | "tenant-occupied" | "vacant"
-  virtualTourUrl?: string
-  openHouseDate?: string
-  listingDate?: string
-  lastPriceChange?: {
-    date: string
-    previousPrice: number
-    currentPrice: number
-  }
-  coordinates?: {
-    lat: number
-    lng: number
-  }
-  agent?: {
-    name: string
-    phone: string
-    email: string
-    agency: string
-  }
+/**
+ * Web-specific search parameters
+ */
+export interface WebPropertySearchParams extends PropertySearchParams {
+  /** Search view state (map vs list) */
+  viewMode?: "map" | "list" | "grid";
+  /** Saved search ID (if loading a saved search) */
+  savedSearchId?: string;
+  /** Include sold properties in results */
+  includeSold?: boolean;
+  /** Include off-market properties */
+  includeOffMarket?: boolean;
 }
 
-export interface VoiceSearchResult {
-  parameters: SearchParameters
-  sourceText: string
-  confidence: number
-  parameterSources?: {
-    [key: string]: string // Maps parameter to source text fragment
-  }
+/**
+ * Property card display variant
+ */
+export type PropertyCardVariant = "default" | "compact" | "featured" | "minimal";
+
+/**
+ * Property list view state
+ */
+export interface PropertyListState {
+  /** Current search parameters */
+  params: WebPropertySearchParams;
+  /** Current page */
+  page: number;
+  /** Total results count */
+  totalCount: number;
+  /** Selected property IDs */
+  selectedIds: string[];
+  /** Loading state */
+  isLoading: boolean;
+  /** Error state */
+  error?: string;
 }
 
-export interface SearchResultMetadata {
-  totalResults: number
-  searchTime: number
-  appliedFilters: string[]
-  suggestedRefinements?: string[]
-  averagePrice?: number
-  priceRange?: {
-    min: number
-    max: number
-  }
-}
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LEGACY TYPE ALIASES (for backward compatibility)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export interface PropertySearchResponse {
-  properties: Property[]
-  metadata: SearchResultMetadata
-  voiceSearchResult?: VoiceSearchResult
-}
+/** @deprecated Use PropertySearchParams from @v1/shared/types/property */
+export type SearchParameters = PropertySearchParams;
+
+/** @deprecated Use Property from @v1/shared/types/property */
+export type PropertyLegacy = SharedProperty;

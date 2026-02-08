@@ -34,6 +34,7 @@ import { useFavorites } from '../../hooks/useFavorites';
 import { PropertyList } from '../../components/property/PropertyList';
 import { SearchFiltersModal, type SearchFilters } from '../../components/search/SearchFiltersModal';
 import { cn } from '../../lib/utils';
+import SearchErrorBoundary from '../../components/error-boundaries/SearchErrorBoundary';
 
 // Quick filter types for horizontal scroll
 type QuickFilterType = 'all' | PropertyType;
@@ -54,7 +55,7 @@ const quickFilters: QuickFilter[] = [
   { label: 'Commercial', value: 'commercial', icon: <Store size={16} /> },
 ];
 
-export default function SearchScreen() {
+function SearchScreenContent() {
   const router = useRouter();
   const { data: properties, isLoading } = useProperties();
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -258,5 +259,28 @@ export default function SearchScreen() {
         onFiltersChange={setFilters}
       />
     </SafeAreaView>
+  );
+}
+
+// Export wrapped component with error boundary
+export default function SearchScreen() {
+  const router = useRouter();
+  
+  return (
+    <SearchErrorBoundary
+      onReset={() => {
+        // Reset search state
+        console.log('Search error boundary reset');
+      }}
+      onClearFilters={() => {
+        // Clear filters would be handled by the component
+        console.log('Clear filters from error boundary');
+      }}
+      onGoHome={() => {
+        router.push('/');
+      }}
+    >
+      <SearchScreenContent />
+    </SearchErrorBoundary>
   );
 }

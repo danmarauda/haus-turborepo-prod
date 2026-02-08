@@ -1,0 +1,20 @@
+{
+  "name": "@v1/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared types and utilities for HAUS platform",
+  "exports": {
+    "./types/property": "./types/property.ts"
+  },
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@v1/typescript": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

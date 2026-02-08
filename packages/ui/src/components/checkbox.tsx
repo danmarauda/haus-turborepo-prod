@@ -6,10 +6,21 @@ import { CheckIcon } from 'lucide-react'
 
 import { cn } from '../utils'
 
+interface CheckboxProps extends Omit<React.ComponentProps<'button'>, 'checked' | 'defaultChecked' | 'onChange'> {
+  checked?: boolean
+  defaultChecked?: boolean
+  onCheckedChange?: (checked: boolean) => void
+  disabled?: boolean
+  required?: boolean
+  name?: string
+  value?: string
+  id?: string
+}
+
 function Checkbox({
   className,
   ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+}: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"

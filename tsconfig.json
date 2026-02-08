@@ -1,6 +1,34 @@
 {
-  "extends": "@v1/typescript/base.json",
   "compilerOptions": {
-    "strictNullChecks": true
-  }
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "strictNullChecks": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    ".next",
+    "haus_sanitized_bundle",
+    "haus_com_sanitized",
+    ".empirica",
+    ".empirica_reflex_logs",
+    ".qdrant_data"
+  ]
 }

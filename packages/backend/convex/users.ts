@@ -6,6 +6,27 @@ import { action, internalMutation, mutation, query } from "./_generated/server";
 import { polar } from "./subscriptions";
 import { username } from "./utils/validators";
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// User Queries (Internal)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/**
+ * Get user by ID (internal query for payment processing)
+ */
+export const getUserById = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    return user;
+  },
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// User Queries (Public)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 export const getUser = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
@@ -137,6 +158,7 @@ export const deleteCurrentUserAccount = action({
 /**
  * Syncs premium subscription status from RevenueCat (mobile app)
  * Called by RevenueCatContext when subscription status changes
+ * Also updates unified subscription fields
  */
 export const syncPremiumStatus = mutation({
   args: {
@@ -157,13 +179,28 @@ export const syncPremiumStatus = mutation({
       .unique();
 
     if (userByRevenueCatId) {
+      const now = Date.now();
+
+      // Determine tier from entitlements
+      let tier: "free" | "premium" | "agency" = isPremium ? "premium" : "free";
+      if (entitlements) {
+        if (entitlements["haus.agency"] || entitlements["haus.pro"]) {
+          tier = "agency";
+        }
+      }
+
       // Update existing user's premium status
       await ctx.db.patch(userByRevenueCatId._id, {
         isPremium,
         premiumExpiresAt: latestExpiration ? new Date(latestExpiration).getTime() : undefined,
         premiumEntitlements: entitlements,
         premiumSubscriptions: subscriptions,
-        premiumUpdatedAt: Date.now(),
+        premiumUpdatedAt: now,
+        // Update unified subscription fields
+        subscriptionTier: tier,
+        subscriptionStatus: isPremium ? "active" : "inactive",
+        subscriptionSource: "revenuecat",
+        subscriptionSyncedAt: now,
       });
       return { success: true, userId: userByRevenueCatId._id };
     }

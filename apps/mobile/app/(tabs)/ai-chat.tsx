@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatContainer } from '../../components/ai/ChatContainer';
 import { useCortexMemory } from '../../hooks/useCortexMemory';
 import { convex } from '../../lib/convex';
+import ChatErrorBoundary from '../../components/error-boundaries/ChatErrorBoundary';
 
 // Get or create a user ID (in production, this comes from auth)
 const getUserId = () => {
@@ -30,7 +31,7 @@ const DEFAULT_SUGGESTIONS = [
   'Tell me about stamp duty in Victoria',
 ];
 
-export default function AIChatScreen() {
+function AIChatScreenContent() {
   const router = useRouter();
 
   // Initialize Cortex memory
@@ -63,6 +64,27 @@ export default function AIChatScreen() {
         />
       </SafeAreaView>
     </View>
+  );
+}
+
+// Export wrapped component with error boundary
+export default function AIChatScreen() {
+  const router = useRouter();
+  
+  return (
+    <ChatErrorBoundary
+      onReset={() => {
+        console.log('Chat error boundary reset');
+      }}
+      onSwitchToVoice={() => {
+        router.push('/voice');
+      }}
+      onGoBack={() => {
+        router.back();
+      }}
+    >
+      <AIChatScreenContent />
+    </ChatErrorBoundary>
   );
 }
 

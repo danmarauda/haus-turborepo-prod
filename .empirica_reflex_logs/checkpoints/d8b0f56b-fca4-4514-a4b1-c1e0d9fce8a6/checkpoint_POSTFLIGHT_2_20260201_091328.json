@@ -1,0 +1,203 @@
+{
+  "session_id": "d8b0f56b-fca4-4514-a4b1-c1e0d9fce8a6",
+  "phase": "POSTFLIGHT",
+  "round": 2,
+  "timestamp": "2026-02-01T09:13:26.251932+00:00",
+  "vectors": {
+    "engagement": 0.9,
+    "know": 0.75,
+    "do": 0.8,
+    "context": 0.8,
+    "clarity": 0.85,
+    "coherence": 0.9,
+    "signal": 0.7,
+    "density": 0.6,
+    "state": 0.8,
+    "change": 0.5,
+    "completion": 0.6,
+    "impact": 0.5,
+    "uncertainty": 0.25
+  },
+  "overall_confidence": 0.783,
+  "meta": {
+    "reasoning": "Empirica-Kimi integration test complete. Successfully mapped both projects: source is single Expo app with tRPC+Hono backend, target is Turborepo with Next.js+Convex. Key findings: 1) tRPC routes need conversion to Convex, 2) Expo version mismatch, 3) AI SDK routes need streaming support check. Integration works well - PREFLIGHT/CHECK/POSTFLIGHT all functional, findings and unknowns properly logged.",
+    "task_summary": "Empirica-Kimi integration test complete. Successfully mapped both projects: source is single Expo app with tRPC+Hono backend, target is Turborepo with Next.js+Convex. Key findings: 1) tRPC routes need conversion to Convex, 2) Expo version mismatch, 3) AI SDK routes need streaming support check. Integration works well - PREFLIGHT/CHECK/POSTFLIGHT all functional, findings and unknowns properly logged.",
+    "postflight_confidence": 0.75,
+    "calibration_accuracy": "good",
+    "deltas": {
+      "engagement": 0.1,
+      "know": 0.15,
+      "do": 0.1,
+      "context": 0.3,
+      "clarity": 0.15,
+      "coherence": 0.1,
+      "signal": 0.1,
+      "density": 0.1,
+      "state": 0.1,
+      "change": 0.2,
+      "completion": 0.6,
+      "impact": 0.5,
+      "uncertainty": -0.15
+    },
+    "calibration_issues": [],
+    "git_commit_sha": "100908db64651b5f24caabec38181e500e4f4ef4",
+    "git_notes_ref": "empirica/session/d8b0f56b-fca4-4514-a4b1-c1e0d9fce8a6/POSTFLIGHT/2"
+  },
+  "epistemic_tags": {},
+  "git_state": {
+    "head_commit": "187ae452e0cd29f3717d8b969e2d8070bd53f0c6",
+    "commits_since_last_checkpoint": [],
+    "uncommitted_changes": {
+      "files_modified": [
+        ".gitlab-ci.yml",
+        "README.md",
+        "apps/app/package.json",
+        "apps/app/postcss.config.mjs",
+        "apps/app/src/app/[locale]/market/page.tsx",
+        "apps/app/src/app/[locale]/page.tsx",
+        "apps/app/src/components/advanced-search-filters.tsx",
+        "apps/app/src/components/agency/agency-content.tsx",
+        "apps/app/src/components/haus/advanced-search-filters.tsx",
+        "apps/app/src/components/haus/featured-listings.tsx",
+        "apps/app/src/components/haus/header.tsx",
+        "apps/app/src/components/haus/property-card.tsx",
+        "apps/app/src/components/haus/property-detail-modal.tsx",
+        "apps/app/src/components/haus/property-results.tsx",
+        "apps/app/src/components/haus/search-content.tsx",
+        "apps/app/src/components/haus/theme-toggle.tsx",
+        "apps/app/src/components/haus/voice-copilot-modal.tsx",
+        "apps/app/src/components/market/category-content.tsx",
+        "apps/app/src/components/market/market-content.tsx",
+        "apps/app/src/components/market/marketplace-content.tsx",
+        "apps/app/src/components/market/provider-dashboard-content.tsx",
+        "apps/app/src/components/market/provider-join-content.tsx",
+        "apps/app/src/components/market/provider-profile-content.tsx",
+        "apps/app/src/components/market/quote-request-content.tsx",
+        "apps/app/src/components/property-card.tsx",
+        "apps/app/src/components/property-detail-modal.tsx",
+        "apps/app/src/components/property-results.tsx",
+        "apps/app/src/components/search/search-content.tsx",
+        "apps/app/src/components/warehaus/warehaus-content.tsx",
+        "apps/app/tsconfig.json",
+        "apps/appraisal/package.json",
+        "apps/appraisal/src/components/comparable-sales.tsx",
+        "apps/appraisal/src/components/marketing-plan.tsx",
+        "apps/appraisal/src/components/navigation.tsx",
+        "apps/appraisal/src/components/property-narrative.tsx",
+        "apps/appraisal/src/components/rental-appraisal.tsx",
+        "apps/appraisal/src/components/report-generation.tsx",
+        "apps/appraisal/src/components/sidebar.tsx",
+        "apps/appraisal/tailwind.config.ts",
+        "apps/appraisal/tsconfig.json",
+        "apps/mobile/app.json",
+        "apps/mobile/app/(auth)/login.tsx",
+        "apps/mobile/app/(auth)/register.tsx",
+        "apps/mobile/app/(tabs)/_layout.tsx",
+        "apps/mobile/app/(tabs)/profile.tsx",
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/eas.json",
+        "apps/mobile/metro.config.js",
+        "apps/mobile/package.json",
+        "apps/mobile/tsconfig.json",
+        "apps/web/package.json",
+        "apps/web/tsconfig.json",
+        "bun.lock",
+        "package.json",
+        "packages/analytics/package.json",
+        "packages/analytics/tsconfig.json",
+        "packages/backend/convex/README.md",
+        "packages/backend/convex/_generated/api.d.ts",
+        "packages/backend/convex/_generated/dataModel.d.ts",
+        "packages/backend/convex/convex.config.ts",
+        "packages/backend/convex/email/index.ts",
+        "packages/backend/convex/env.ts",
+        "packages/backend/convex/schema.ts",
+        "packages/backend/convex/tsconfig.json",
+        "packages/backend/convex/users.ts",
+        "packages/backend/convex/web.ts",
+        "packages/backend/package.json",
+        "packages/email/package.json",
+        "packages/email/tsconfig.json",
+        "packages/logger/package.json",
+        "packages/logger/tsconfig.json",
+        "packages/ui/package.json",
+        "packages/ui/tsconfig.json",
+        "tsconfig.json",
+        "turbo.json"
+      ],
+      "files_added": [],
+      "files_deleted": [
+        "packages/backend/convex/email/templates/subscriptionEmail.tsx"
+      ],
+      "diff_stat": ".gitlab-ci.yml                                     |   102 +\n README.md                                          |    20 +\n apps/app/package.json                              |    42 +-\n apps/app/postcss.config.mjs                        |     2 +-\n apps/app/src/app/[locale]/market/page.tsx          |     6 +-\n apps/app/src/app/[locale]/page.tsx                 |     4 +-\n .../app/src/components/advanced-search-filters.tsx |    12 +-\n apps/app/src/components/agency/agency-content.tsx  |    16 +-\n .../components/haus/advanced-search-filters.tsx    |    12 +-\n apps/app/src/components/haus/featured-listings.tsx |     2 +-\n apps/app/src/components/haus/header.tsx            |     8 +-\n apps/app/src/components/haus/property-card.tsx     |     6 +-\n .../src/components/haus/property-detail-modal.tsx  |    10 +-\n apps/app/src/components/haus/property-results.tsx  |     4 +-\n apps/app/src/components/haus/search-content.tsx    |    18 +-\n apps/app/src/components/haus/theme-toggle.tsx      |     2 +-\n .../src/components/haus/voice-copilot-modal.tsx    |   135 +-\n .../app/src/components/market/category-content.tsx |    16 +-\n apps/app/src/components/market/market-content.tsx  |    12 +-\n .../src/components/market/marketplace-content.tsx  |     8 +-\n .../market/provider-dashboard-content.tsx          |    22 +-\n .../components/market/provider-join-content.tsx    |    14 +-\n .../components/market/provider-profile-content.tsx |    14 +-\n .../components/market/quote-request-content.tsx    |    20 +-\n apps/app/src/components/property-card.tsx          |     6 +-\n apps/app/src/components/property-detail-modal.tsx  |    10 +-\n apps/app/src/components/property-results.tsx       |     4 +-\n apps/app/src/components/search/search-content.tsx  |    18 +-\n .../src/components/warehaus/warehaus-content.tsx   |    20 +-\n apps/app/tsconfig.json                             |    13 +-\n apps/appraisal/package.json                        |    30 +-\n apps/appraisal/src/components/comparable-sales.tsx |     2 +-\n apps/appraisal/src/components/marketing-plan.tsx   |     4 +-\n apps/appraisal/src/components/navigation.tsx       |     2 +-\n .../src/components/property-narrative.tsx          |     2 +-\n apps/appraisal/src/components/rental-appraisal.tsx |     2 +-\n .../appraisal/src/components/report-generation.tsx |     2 +-\n apps/appraisal/src/components/sidebar.tsx          |     2 +-\n apps/appraisal/tailwind.config.ts                  |     2 +-\n apps/appraisal/tsconfig.json                       |    13 +-\n apps/mobile/app.json                               |    44 +-\n apps/mobile/app/(auth)/login.tsx                   |    23 +-\n apps/mobile/app/(auth)/register.tsx                |    19 +-\n apps/mobile/app/(tabs)/_layout.tsx                 |    16 +-\n apps/mobile/app/(tabs)/profile.tsx                 |     2 +-\n apps/mobile/app/_layout.tsx                        |   205 +-\n apps/mobile/eas.json                               |     7 +-\n apps/mobile/metro.config.js                        |    13 +-\n apps/mobile/package.json                           |   125 +-\n apps/mobile/tsconfig.json                          |    13 +-\n apps/web/package.json                              |    22 +-\n apps/web/tsconfig.json                             |    13 +-\n bun.lock                                           | 16806 +++++++++++++++++--\n package.json                                       |    20 +-\n packages/analytics/package.json                    |     4 +-\n packages/analytics/tsconfig.json                   |    21 +-\n packages/backend/convex/README.md                  |    10 +-\n packages/backend/convex/_generated/api.d.ts        |    37 +-\n packages/backend/convex/_generated/dataModel.d.ts  |     2 +-\n packages/backend/convex/convex.config.ts           |     2 +\n packages/backend/convex/email/index.ts             |    79 +-\n .../convex/email/templates/subscriptionEmail.tsx   |   143 -\n packages/backend/convex/env.ts                     |    38 +-\n packages/backend/convex/schema.ts                  |   685 +-\n packages/backend/convex/tsconfig.json              |     4 +-\n packages/backend/convex/users.ts                   |   100 +\n packages/backend/convex/web.ts                     |    87 +-\n packages/backend/package.json                      |    17 +-\n packages/email/package.json                        |     6 +-\n packages/email/tsconfig.json                       |    21 +-\n packages/logger/package.json                       |     2 +-\n packages/logger/tsconfig.json                      |    13 +-\n packages/ui/package.json                           |    59 +-\n packages/ui/tsconfig.json                          |    17 +-\n tsconfig.json                                      |     7 +-\n turbo.json                                         |     2 +-\n 76 files changed, 17718 insertions(+), 1605 deletions(-)"
+    }
+  },
+  "learning_delta": {
+    "engagement": {
+      "prev": 0.9,
+      "curr": 0.9,
+      "delta": 0.0
+    },
+    "know": {
+      "prev": 0.7,
+      "curr": 0.75,
+      "delta": 0.05
+    },
+    "do": {
+      "prev": 0.8,
+      "curr": 0.8,
+      "delta": 0.0
+    },
+    "context": {
+      "prev": 0.8,
+      "curr": 0.8,
+      "delta": 0.0
+    },
+    "clarity": {
+      "prev": 0.8,
+      "curr": 0.85,
+      "delta": 0.05
+    },
+    "coherence": {
+      "prev": 0.9,
+      "curr": 0.9,
+      "delta": 0.0
+    },
+    "signal": {
+      "prev": 0.7,
+      "curr": 0.7,
+      "delta": 0.0
+    },
+    "density": {
+      "prev": 0.6,
+      "curr": 0.6,
+      "delta": 0.0
+    },
+    "state": {
+      "prev": 0.8,
+      "curr": 0.8,
+      "delta": 0.0
+    },
+    "change": {
+      "prev": 0.4,
+      "curr": 0.5,
+      "delta": 0.1
+    },
+    "completion": {
+      "prev": 0.4,
+      "curr": 0.6,
+      "delta": 0.2
+    },
+    "impact": {
+      "prev": 0.3,
+      "curr": 0.5,
+      "delta": 0.2
+    },
+    "uncertainty": {
+      "prev": 0.3,
+      "curr": 0.25,
+      "delta": -0.05
+    }
+  },
+  "token_count": 874
+}

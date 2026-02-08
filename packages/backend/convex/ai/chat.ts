@@ -15,6 +15,7 @@ import { v } from "convex/values";
 import { action } from "../_generated/server";
 import { api } from "../_generated/api";
 import { ANONYMOUS_USER } from "../../lib/constants";
+import { RateLimits, assertRateLimit } from "../rateLimit";
 
 // AI SDK 6.x imports
 import { generateText, streamText, generateObject, tool } from "ai";
@@ -127,6 +128,7 @@ async function storeInMemory(
 /**
  * Chat action - streaming text generation
  * AI SDK 6.x: Uses streamText for true streaming support
+ * Rate limit: 50 requests/minute per user
  */
 export const chat = action({
   args: {
@@ -137,6 +139,16 @@ export const chat = action({
   },
   handler: async (ctx, args) => {
     const { messages, systemPrompt, userId = ANONYMOUS_USER } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.AI_CHAT.keyPrefix,
+      RateLimits.AI_CHAT.maxRequests,
+      RateLimits.AI_CHAT.windowMs
+    );
 
     const system =
       systemPrompt ??
@@ -178,6 +190,7 @@ Be helpful, professional, and knowledgeable about Australian real estate termino
  * Chat streaming action - returns a stream for real-time responses
  * AI SDK 6.x: Uses streamText for streaming
  * Note: In Convex, we return text chunks as they're generated
+ * Rate limit: 30 requests/minute per user
  */
 export const chatStream = action({
   args: {
@@ -187,6 +200,16 @@ export const chatStream = action({
   },
   handler: async (ctx, args) => {
     const { messages, systemPrompt, userId = ANONYMOUS_USER } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.AI_STREAM.keyPrefix,
+      RateLimits.AI_STREAM.maxRequests,
+      RateLimits.AI_STREAM.windowMs
+    );
 
     const system =
       systemPrompt ??
@@ -227,6 +250,7 @@ Be helpful, professional, and knowledgeable about Australian real estate termino
 /**
  * Analyze property image - structured output
  * AI SDK 6.x: Uses generateObject with Zod schema
+ * Rate limit: 20 requests/minute per user
  */
 export const analyzeProperty = action({
   args: {
@@ -236,6 +260,16 @@ export const analyzeProperty = action({
   },
   handler: async (ctx, args) => {
     const { imageBase64, additionalContext, userId = ANONYMOUS_USER } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.AI_ANALYZE_PROPERTY.keyPrefix,
+      RateLimits.AI_ANALYZE_PROPERTY.maxRequests,
+      RateLimits.AI_ANALYZE_PROPERTY.windowMs
+    );
 
     // AI SDK 6.x: generateObject with Zod schema
     const result = await generateObject({
@@ -282,6 +316,7 @@ Provide a comprehensive analysis including property type, features, condition, e
 /**
  * Quick summary of property image
  * AI SDK 6.x: Uses generateText
+ * Rate limit: 20 requests/minute per user (shared with analyze)
  */
 export const summarizeProperty = action({
   args: {
@@ -290,6 +325,16 @@ export const summarizeProperty = action({
   },
   handler: async (ctx, args) => {
     const { imageBase64, userId = ANONYMOUS_USER } = args;
+
+    // Apply rate limiting (shares limit with analyzeProperty)
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.AI_ANALYZE_PROPERTY.keyPrefix,
+      RateLimits.AI_ANALYZE_PROPERTY.maxRequests,
+      RateLimits.AI_ANALYZE_PROPERTY.windowMs
+    );
 
     const result = await generateText({
       model: openai("gpt-4o-mini"),
@@ -427,6 +472,7 @@ export const generateTextLegacy = action({
 /**
  * Chat with tool support for property searches
  * AI SDK 6.x: Uses tool() helper for defining tools
+ * Rate limit: 50 requests/minute per user
  */
 export const chatWithTools = action({
   args: {
@@ -437,6 +483,16 @@ export const chatWithTools = action({
   },
   handler: async (ctx, args) => {
     const { messages, systemPrompt, enablePropertySearch, userId = ANONYMOUS_USER } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.AI_CHAT.keyPrefix,
+      RateLimits.AI_CHAT.maxRequests,
+      RateLimits.AI_CHAT.windowMs
+    );
 
     const system =
       systemPrompt ??

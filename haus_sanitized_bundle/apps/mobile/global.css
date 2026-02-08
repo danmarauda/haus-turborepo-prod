@@ -1,0 +1,381 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =================================================================
+   HAUS Design System - Global Styles
+   ================================================================= */
+
+@layer base {
+  /* Default to dark theme (HAUS aesthetic) */
+  :root {
+    /* =================================================================
+       Base Theme Variables - Dark by Default (HAUS Aesthetic)
+       ================================================================= */
+    --background: 0 0% 4%; /* neutral-950 */
+    --foreground: 0 0% 98%; /* neutral-50 */
+    --card: 0 0% 4%; /* neutral-950 */
+    --card-foreground: 0 0% 98%; /* neutral-50 */
+    --popover: 0 0% 4%; /* neutral-950 */
+    --popover-foreground: 0 0% 98%; /* neutral-50 */
+    --primary: 199 89% 48%; /* sky-500 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 15%; /* neutral-800 */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%; /* neutral-800 */
+    --muted-foreground: 0 0% 64%; /* neutral-400 */
+    --accent: 199 89% 48%; /* sky-500 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%; /* rose-500 */
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 15%; /* neutral-800 */
+    --input: 0 0% 15%; /* neutral-800 */
+    --ring: 199 89% 48%; /* sky-500 */
+
+    /* =================================================================
+       HAUS Design Token CSS Variables
+       ================================================================= */
+    
+    /* Font Family */
+    --font-primary: 'Abel', system-ui, sans-serif;
+
+    /* Neutral Palette */
+    --neutral-50: #fafafa;
+    --neutral-100: #f5f5f5;
+    --neutral-200: #e5e5e5;
+    --neutral-300: #d4d4d4;
+    --neutral-400: #a3a3a3;
+    --neutral-500: #737373;
+    --neutral-600: #525252;
+    --neutral-700: #404040;
+    --neutral-800: #262626;
+    --neutral-900: #171717;
+    --neutral-950: #0a0a0a;
+
+    /* Sky Palette */
+    --sky-50: #f0f9ff;
+    --sky-100: #e0f2fe;
+    --sky-200: #bae6fd;
+    --sky-300: #7dd3fc;
+    --sky-400: #38bdf8;
+    --sky-500: #0ea5e9;
+    --sky-600: #0284c7;
+
+    /* Blue Palette */
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+
+    /* Cyan Palette */
+    --cyan-200: #a5f3fc;
+    --cyan-300: #67e8f9;
+    --cyan-400: #22d3ee;
+    --cyan-500: #06b6d4;
+
+    /* Amber Palette */
+    --amber-300: #fcd34d;
+    --amber-400: #fbbf24;
+    --amber-500: #f59e0b;
+
+    /* Rose Palette */
+    --rose-300: #fda4af;
+    --rose-400: #fb7185;
+    --rose-500: #f43f5e;
+
+    /* Emerald Palette */
+    --emerald-300: #6ee7b7;
+    --emerald-400: #34d399;
+    --emerald-500: #10b981;
+
+    /* Semantic Colors - Status */
+    --color-sale: #10b981;
+    --color-rent: #3b82f6;
+    --color-auction: #f59e0b;
+    --color-offmarket: #737373;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-xxl: 24px;
+    --space-xxxl: 32px;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-xxl: 24px;
+    --radius-full: 999px;
+
+    /* Font Sizes */
+    --text-xs: 11px;
+    --text-sm: 12px;
+    --text-base: 14px;
+    --text-md: 15px;
+    --text-lg: 17px;
+    --text-xl: 18px;
+    --text-xxl: 19px;
+
+    /* Opacity */
+    --opacity-disabled: 0.4;
+    --opacity-subtle: 0.6;
+    --opacity-medium: 0.8;
+    --opacity-high: 0.9;
+    --opacity-full: 1;
+
+    /* Glassmorphism */
+    --glass-light: rgba(255, 255, 255, 0.1);
+    --glass-medium: rgba(255, 255, 255, 0.15);
+    --glass-heavy: rgba(255, 255, 255, 0.2);
+    --glass-dark: rgba(0, 0, 0, 0.3);
+    --glass-border-light: rgba(255, 255, 255, 0.2);
+    --glass-border-medium: rgba(255, 255, 255, 0.1);
+
+    /* Component-specific */
+    --card-bg: #0a0a0a;
+    --card-border: #262626;
+    --input-bg: rgba(0, 0, 0, 0.3);
+    --input-border: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Light Theme Override */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 199 89% 48%;
+
+    /* Light theme glassmorphism adjustments */
+    --glass-light: rgba(0, 0, 0, 0.05);
+    --glass-medium: rgba(0, 0, 0, 0.1);
+    --glass-heavy: rgba(0, 0, 0, 0.15);
+    --glass-dark: rgba(255, 255, 255, 0.5);
+    --glass-border-light: rgba(0, 0, 0, 0.1);
+    --glass-border-medium: rgba(0, 0, 0, 0.05);
+
+    --card-bg: #ffffff;
+    --card-border: #e5e5e5;
+    --input-bg: rgba(255, 255, 255, 0.5);
+    --input-border: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* =================================================================
+   Glassmorphism Utility Classes
+   ================================================================= */
+
+@layer components {
+  /* Base glass effect */
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Light glass background with border */
+  .glass-light {
+    background-color: var(--glass-light);
+    border: 1px solid var(--glass-border-light);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Medium glass background with border */
+  .glass-medium {
+    background-color: var(--glass-medium);
+    border: 1px solid var(--glass-border-medium);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Heavy glass background with border */
+  .glass-heavy {
+    background-color: var(--glass-heavy);
+    border: 1px solid var(--glass-border-light);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Dark glass for inputs */
+  .glass-dark {
+    background-color: var(--glass-dark);
+    border: 1px solid var(--glass-border-medium);
+  }
+
+  /* Glass input style */
+  .glass-input {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+  }
+
+  /* HAUS Card style */
+  .glass-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+  }
+
+  /* HAUS Pill/Tag style */
+  .glass-pill {
+    background-color: var(--glass-medium);
+    border: 1px solid var(--glass-border-light);
+    border-radius: var(--radius-full);
+    padding: 6px 10px;
+  }
+
+  /* HAUS Button Primary */
+  .btn-primary {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    padding: 10px 16px;
+  }
+
+  /* HAUS Button Secondary */
+  .btn-secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+  }
+
+  /* Icon wrapper small */
+  .icon-wrapper-sm {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Icon wrapper medium */
+  .icon-wrapper-md {
+    width: 32px;
+    height: 32px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* =================================================================
+   Category Colors for AI Features
+   ================================================================= */
+
+@layer components {
+  .category-learn {
+    background-color: rgba(14, 165, 233, 0.15);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    color: #7dd3fc;
+  }
+
+  .category-plan {
+    background-color: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+  }
+
+  .category-explore {
+    background-color: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: #67e8f9;
+  }
+
+  .category-prepare {
+    background-color: rgba(14, 165, 233, 0.15);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    color: #7dd3fc;
+  }
+
+  .category-apply {
+    background-color: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+  }
+
+  .category-collaborate {
+    background-color: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: #67e8f9;
+  }
+}
+
+/* =================================================================
+   Semantic Color Utilities
+   ================================================================= */
+
+@layer utilities {
+  .text-sale {
+    color: var(--color-sale);
+  }
+
+  .text-rent {
+    color: var(--color-rent);
+  }
+
+  .text-auction {
+    color: var(--color-auction);
+  }
+
+  .text-offmarket {
+    color: var(--color-offmarket);
+  }
+
+  .bg-sale {
+    background-color: var(--color-sale);
+  }
+
+  .bg-rent {
+    background-color: var(--color-rent);
+  }
+
+  .bg-auction {
+    background-color: var(--color-auction);
+  }
+
+  .bg-offmarket {
+    background-color: var(--color-offmarket);
+  }
+}
+
+/* =================================================================
+   Dark Theme HAUS Aesthetic
+   ================================================================= */
+
+@layer base {
+  /* Force dark theme as default */
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: var(--font-primary);
+    background-color: var(--neutral-950);
+    color: var(--neutral-50);
+  }
+}

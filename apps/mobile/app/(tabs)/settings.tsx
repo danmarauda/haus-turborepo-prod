@@ -55,7 +55,8 @@ const APP_VERSION = '1.0.0';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  const { signOut, email, isAuthenticated } = useAuth();
+  const { signOut, user, isAuthenticated } = useAuth();
+  const email = user?.email;
   const { isDark, themeMode, setTheme } = useTheme();
 
   const currentLanguage = i18n.language as LanguageOption;

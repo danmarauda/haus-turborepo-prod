@@ -75,10 +75,10 @@ export default function BillingSettings() {
   }
 
   const monthlyProProduct = products?.find(
-    (product) => product.recurringInterval === "month",
+    (product: any) => product.recurringInterval === "month",
   );
   const yearlyProProduct = products?.find(
-    (product) => product.recurringInterval === "year",
+    (product: any) => product.recurringInterval === "year",
   );
 
   return (

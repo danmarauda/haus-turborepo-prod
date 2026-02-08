@@ -1,0 +1,38 @@
+---
+# HAUS Mobile - Sign Up Flow Test
+# Tests new user registration with validation
+
+appId: com.haus.app
+---
+- launchApp
+
+# Navigate to sign up if not already there
+- tapOn: "Sign Up"
+- assertVisible: "Create account"
+- assertVisible: "Join HAUS to find your perfect property"
+
+# Test validation - try empty form
+- tapOn: "Create Account"
+- assertVisible: "Name"
+- assertVisible: "Email"
+- assertVisible: "Password"
+
+# Fill in valid registration data
+- tapOn: "nameInput" # or use coordinates if needed
+- inputText: "Test User"
+
+- tapOn: "emailInput"
+- inputText: "test@haus.com"
+
+- tapOn: "passwordInput"
+- inputText: "TestPassword123!"
+
+# Submit registration
+- tapOn: "Create Account"
+- waitForAnimationToEnd
+
+# Should navigate to tabs (home)
+- assertVisible: "Home"
+- assertVisible: "Search"
+- assertVisible: "Market"
+- assertVisible: "Agency"

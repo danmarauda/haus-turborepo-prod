@@ -44,6 +44,7 @@ import * as Haptics from 'expo-haptics';
 import { useProperty } from '../../hooks/useProperties';
 import { useFavorites } from '../../hooks/useFavorites';
 import { cn } from '../../lib/utils';
+import PropertyErrorBoundary from '../../components/error-boundaries/PropertyErrorBoundary';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -94,7 +95,7 @@ function FeatureBadge({ label, active }: FeatureBadgeProps) {
   );
 }
 
-export default function PropertyDetailScreen() {
+function PropertyDetailScreenContent() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: property, isLoading } = useProperty(id || null);

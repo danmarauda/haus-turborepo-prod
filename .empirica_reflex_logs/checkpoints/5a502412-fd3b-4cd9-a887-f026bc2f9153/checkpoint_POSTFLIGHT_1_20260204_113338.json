@@ -1,0 +1,169 @@
+{
+  "session_id": "5a502412-fd3b-4cd9-a887-f026bc2f9153",
+  "phase": "POSTFLIGHT",
+  "round": 1,
+  "timestamp": "2026-02-04T11:33:36.453336+00:00",
+  "vectors": {
+    "engagement": 0.9,
+    "know": 0.95,
+    "do": 0.95,
+    "context": 0.95,
+    "clarity": 0.95,
+    "coherence": 0.95,
+    "signal": 0.95,
+    "density": 0.9,
+    "state": 0.95,
+    "change": 0.8,
+    "completion": 1.0,
+    "impact": 0.85,
+    "uncertainty": 0.05
+  },
+  "overall_confidence": 0.95,
+  "meta": {
+    "reasoning": "Successfully completed the tenders.ts file with all requested functionality:\n\n1. **Tables covered:** tenders (project management) and tenderDocuments (individual documents)\n\n2. **Queries implemented:**\n   - getTender (alias: get) - Get by ID\n   - listTenders (alias: list) - List with filters by status/client\n   - getTenderDocuments (alias: getDocumentsByTender) - Get documents for a tender\n   - getDocumentById (alias: getDocument) - Get single document\n   - searchTenders - NEW search across name, client, metadata\n   - getByStatus, getUpcomingDeadlines, getWithDocuments\n\n3. **Mutations implemented:**\n   - createTender (alias: create) - Create tender\n   - updateTenderStatus (alias: updateStatus) - Update status\n   - addDocument - Add document with storageId support\n   - deleteDocument (alias: removeDocument) - Delete with storage cleanup\n   - update, updateDocument, remove/deleteTender\n\n4. **Seed function:** Creates 5 sample tenders with 4 documents\n\n5. **Storage integration:** Full integration with Convex storage - documents support storageId field, automatic cleanup on deletion\n\nFile follows codebase patterns from propertyListings.ts, uses proper TypeScript types, indexes from schema.ts, and maintains backward compatibility with existing exports.",
+    "task_summary": "Successfully completed the tenders.ts file with all requested functionality:\n\n1. **Tables covered:** tenders (project management) and tenderDocuments (individual documents)\n\n2. **Queries implemented:**\n   - getTender (alias: get) - Get by ID\n   - listTenders (alias: list) - List with filters by status/client\n   - getTenderDocuments (alias: getDocumentsByTender) - Get documents for a tender\n   - getDocumentById (alias: getDocument) - Get single document\n   - searchTenders - NEW search across name, client, metadata\n   - getByStatus, getUpcomingDeadlines, getWithDocuments\n\n3. **Mutations implemented:**\n   - createTender (alias: create) - Create tender\n   - updateTenderStatus (alias: updateStatus) - Update status\n   - addDocument - Add document with storageId support\n   - deleteDocument (alias: removeDocument) - Delete with storage cleanup\n   - update, updateDocument, remove/deleteTender\n\n4. **Seed function:** Creates 5 sample tenders with 4 documents\n\n5. **Storage integration:** Full integration with Convex storage - documents support storageId field, automatic cleanup on deletion\n\nFile follows codebase patterns from propertyListings.ts, uses proper TypeScript types, indexes from schema.ts, and maintains backward compatibility with existing exports.",
+    "postflight_confidence": 0.95,
+    "calibration_accuracy": "good",
+    "deltas": {
+      "engagement": 0.0,
+      "know": 0.1,
+      "do": 0.05,
+      "context": 0.1,
+      "clarity": 0.05,
+      "coherence": 0.1,
+      "signal": 0.05,
+      "density": 0.1,
+      "state": 0.05,
+      "change": 0.6,
+      "completion": 0.9,
+      "impact": 0.15,
+      "uncertainty": -0.15
+    },
+    "calibration_issues": [],
+    "git_commit_sha": "f6b6a53b800c1f9689af30328584eac0569a149f",
+    "git_notes_ref": "empirica/session/5a502412-fd3b-4cd9-a887-f026bc2f9153/POSTFLIGHT/1"
+  },
+  "epistemic_tags": {},
+  "git_state": {
+    "head_commit": "dd0c820a2f17441442e3301d941f94336382920d",
+    "commits_since_last_checkpoint": [],
+    "uncommitted_changes": {
+      "files_modified": [
+        "MIGRATION_ANALYSIS.md",
+        "apps/app/next.config.mjs",
+        "apps/app/package.json",
+        "apps/app/src/app/[locale]/(dashboard)/_components/navigation.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/billing/page.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/layout.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/page.tsx",
+        "apps/app/src/app/[locale]/onboarding/page.tsx",
+        "apps/app/src/app/api/voice-search/route.ts",
+        "apps/app/src/components/haus/voice-copilot-modal.tsx",
+        "apps/app/src/components/haus/voice-orb.tsx",
+        "apps/app/src/components/search/search-content.tsx",
+        "apps/app/src/components/voice-orb.tsx",
+        "apps/app/src/types/property.ts",
+        "apps/app/tsconfig.json",
+        "apps/mobile/app/(tabs)/_layout.tsx",
+        "apps/mobile/app/(tabs)/voice.tsx",
+        "apps/mobile/components/voice/index.ts",
+        "apps/mobile/hooks/index.ts",
+        "apps/mobile/hooks/useFavorites.ts",
+        "apps/mobile/package.json",
+        "apps/mobile/providers/index.ts",
+        "apps/mobile/services/auth/token.ts",
+        "bun.lock",
+        "packages/backend/convex/_generated/api.d.ts",
+        "packages/backend/convex/env.ts",
+        "packages/backend/convex/http.ts",
+        "packages/backend/convex/schema.ts",
+        "packages/backend/convex/users.ts",
+        "packages/backend/package.json",
+        "packages/ui/package.json",
+        "packages/ui/src/components/button.tsx",
+        "packages/ui/src/components/checkbox.tsx",
+        "packages/ui/src/components/label.tsx",
+        "packages/ui/src/components/progress.tsx",
+        "packages/ui/src/components/radio-group.tsx",
+        "packages/ui/src/components/slider.tsx",
+        "packages/ui/src/components/tabs.tsx",
+        "packages/ui/src/globals.css",
+        "packages/ui/tailwind.config.ts",
+        "tsconfig.json"
+      ],
+      "files_added": [],
+      "files_deleted": [
+        "packages/backend/lib/cortex/hooks.ts"
+      ],
+      "diff_stat": "MIGRATION_ANALYSIS.md                              | 1251 +++++++-------------\n apps/app/next.config.mjs                           |    6 +-\n apps/app/package.json                              |    7 +-\n .../(dashboard)/_components/navigation.tsx         |    4 +-\n .../[locale]/(dashboard)/settings/billing/page.tsx |    4 +-\n .../app/[locale]/(dashboard)/settings/layout.tsx   |    7 +-\n .../src/app/[locale]/(dashboard)/settings/page.tsx |    6 +-\n apps/app/src/app/[locale]/onboarding/page.tsx      |    6 +-\n apps/app/src/app/api/voice-search/route.ts         |  450 +++----\n .../src/components/haus/voice-copilot-modal.tsx    |    2 +-\n apps/app/src/components/haus/voice-orb.tsx         |    2 +-\n apps/app/src/components/search/search-content.tsx  |  126 +-\n apps/app/src/components/voice-orb.tsx              |    2 +-\n apps/app/src/types/property.ts                     |  215 +---\n apps/app/tsconfig.json                             |   30 +-\n apps/mobile/app/(tabs)/_layout.tsx                 |    9 +-\n apps/mobile/app/(tabs)/voice.tsx                   |    4 +-\n apps/mobile/components/voice/index.ts              |   11 +-\n apps/mobile/hooks/index.ts                         |   94 +-\n apps/mobile/hooks/useFavorites.ts                  |  364 +++++-\n apps/mobile/package.json                           |    2 +\n apps/mobile/providers/index.ts                     |   20 +-\n apps/mobile/services/auth/token.ts                 |    7 +-\n bun.lock                                           |  200 +++-\n packages/backend/convex/_generated/api.d.ts        |   26 +\n packages/backend/convex/env.ts                     |   12 +\n packages/backend/convex/http.ts                    |  296 ++++-\n packages/backend/convex/schema.ts                  |  334 +++++-\n packages/backend/convex/users.ts                   |   21 +\n packages/backend/lib/cortex/hooks.ts               |  483 --------\n packages/backend/package.json                      |    4 +-\n packages/ui/package.json                           |   16 +\n packages/ui/src/components/button.tsx              |   12 +-\n packages/ui/src/components/checkbox.tsx            |   13 +-\n packages/ui/src/components/label.tsx               |   11 +-\n packages/ui/src/components/progress.tsx            |   15 +-\n packages/ui/src/components/radio-group.tsx         |   32 +-\n packages/ui/src/components/slider.tsx              |   15 +-\n packages/ui/src/components/tabs.tsx                |   63 +-\n packages/ui/src/globals.css                        |   99 +-\n packages/ui/tailwind.config.ts                     |    2 +-\n tsconfig.json                                      |   34 +-\n 42 files changed, 2343 insertions(+), 1974 deletions(-)"
+    }
+  },
+  "learning_delta": {
+    "engagement": {
+      "prev": 0.9,
+      "curr": 0.9,
+      "delta": 0.0
+    },
+    "know": {
+      "prev": 0.85,
+      "curr": 0.95,
+      "delta": 0.1
+    },
+    "do": {
+      "prev": 0.9,
+      "curr": 0.95,
+      "delta": 0.05
+    },
+    "context": {
+      "prev": 0.85,
+      "curr": 0.95,
+      "delta": 0.1
+    },
+    "clarity": {
+      "prev": 0.9,
+      "curr": 0.95,
+      "delta": 0.05
+    },
+    "coherence": {
+      "prev": 0.85,
+      "curr": 0.95,
+      "delta": 0.1
+    },
+    "signal": {
+      "prev": 0.9,
+      "curr": 0.95,
+      "delta": 0.05
+    },
+    "density": {
+      "prev": 0.8,
+      "curr": 0.9,
+      "delta": 0.1
+    },
+    "state": {
+      "prev": 0.9,
+      "curr": 0.95,
+      "delta": 0.05
+    },
+    "change": {
+      "prev": 0.2,
+      "curr": 0.8,
+      "delta": 0.6
+    },
+    "completion": {
+      "prev": 0.1,
+      "curr": 1.0,
+      "delta": 0.9
+    },
+    "impact": {
+      "prev": 0.7,
+      "curr": 0.85,
+      "delta": 0.15
+    },
+    "uncertainty": {
+      "prev": 0.2,
+      "curr": 0.05,
+      "delta": -0.15
+    }
+  },
+  "token_count": 903
+}

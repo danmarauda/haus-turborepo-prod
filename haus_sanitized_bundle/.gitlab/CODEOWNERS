@@ -1,0 +1,79 @@
+# =============================================================================
+# GitLab CODEOWNERS for Haus Platform
+# =============================================================================
+# These owners will be requested for review when someone opens a merge request
+# that modifies code they own.
+#
+# Order matters: later rules override earlier ones.
+# =============================================================================
+
+# Default owners for everything in the repo
+* @platform-team
+
+# =============================================================================
+# Apps
+# =============================================================================
+
+# Main dashboard application
+/apps/app/ @app-team @platform-team
+
+# Marketing website
+/apps/web/ @marketing-team @platform-team
+
+# Appraisal tool
+/apps/appraisal/ @tools-team @platform-team
+
+# Mobile application
+/apps/mobile/ @mobile-team @platform-team
+
+# =============================================================================
+# Packages
+# =============================================================================
+
+# Backend (Convex)
+/packages/backend/ @backend-team @platform-team
+
+# Shared UI components
+/packages/ui/ @design-team @platform-team
+
+# Analytics
+/packages/analytics/ @platform-team
+
+# Email templates
+/packages/email/ @marketing-team @platform-team
+
+# Logger
+/packages/logger/ @platform-team
+
+# =============================================================================
+# Configuration & DevOps
+# =============================================================================
+
+# CI/CD configuration
+/.gitlab-ci.yml @devops-team @platform-team
+/.github/ @devops-team @platform-team
+
+# Build configuration
+/turbo.json @devops-team @platform-team
+/package.json @platform-team
+/bun.lock @platform-team
+
+# TypeScript configuration
+/tooling/ @platform-team
+/tsconfig.json @platform-team
+
+# Vercel configuration
+**/vercel.json @devops-team @platform-team
+
+# EAS configuration
+**/eas.json @mobile-team @devops-team
+
+# =============================================================================
+# Security-sensitive files
+# =============================================================================
+
+# Environment files (should rarely change)
+**/.env* @platform-team @security-team
+
+# Auth configuration
+**/auth*.ts @backend-team @security-team

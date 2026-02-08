@@ -7,6 +7,9 @@
       "@/*": [
         "./*"
       ],
+      "@v1/backend/*": [
+        "../../packages/backend/*"
+      ],
       "@haus/backend/*": [
         "../../packages/backend/*"
       ]

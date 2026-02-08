@@ -41,6 +41,7 @@ import {
 import { PriceRangeSlider } from "./price-range-slider"
 import { useCortexMemory, useConversationMemory, type RecallResult } from "@/hooks/use-cortex-memory"
 import { MemoryContextPanel, MemoryQuickSummary } from "./memory-context-panel"
+import { VoiceErrorBoundary } from "@/components/error-boundaries"
 
 interface VoiceCopilotModalProps {
   onResults: (results: VoiceSearchResult) => void
@@ -239,7 +240,7 @@ const generateHistogramData = (length: number): number[] => {
   return data
 }
 
-export function VoiceCopilotModal({ onResults, onClose, initialParams, userId = "anonymous" }: VoiceCopilotModalProps) {
+function VoiceCopilotModalInner({ onResults, onClose, initialParams, userId = "anonymous" }: VoiceCopilotModalProps) {
   const [status, setStatus] = useState<SearchStatus>("demo")
   const [isDemoMode, setIsDemoMode] = useState(true)
   const [isClient, setIsClient] = useState(false)
@@ -351,7 +352,7 @@ export function VoiceCopilotModal({ onResults, onClose, initialParams, userId = 
       conversationMemory.storeConversation({
         userQuery: transcript,
         agentResponse,
-        propertyContext: searchParams,
+        propertyContext: searchParams as Record<string, unknown>,
       })
     }
   }, [status, transcript, searchParams, conversationMemory, userId])
@@ -1108,5 +1109,24 @@ export function VoiceCopilotModal({ onResults, onClose, initialParams, userId = 
         </div>
       </div>
     </div>
+  )
+}
+
+export function VoiceCopilotModal(props: VoiceCopilotModalProps) {
+  return (
+    <VoiceErrorBoundary
+      onReset={() => {
+        console.log('Voice error boundary reset')
+      }}
+      onSwitchToText={() => {
+        // Close modal and let parent handle switching to text
+        props.onClose()
+      }}
+      onEndCall={() => {
+        props.onClose()
+      }}
+    >
+      <VoiceCopilotModalInner {...props} />
+    </VoiceErrorBoundary>
   )
 }

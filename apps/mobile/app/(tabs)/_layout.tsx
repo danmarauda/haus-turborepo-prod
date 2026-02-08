@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Search, Store, Building2, User, Settings, Crown, GraduationCap, Heart, MessageSquare, Mic } from 'lucide-react-native';
+import { Home, Search, Store, Building2, User, Settings, Crown, GraduationCap, Heart, MessageSquare, Mic, Compass } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -33,6 +33,13 @@ export default function TabLayout() {
         options={{
           title: 'Search',
           tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="compass"
+        options={{
+          title: 'Compass',
+          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -66,11 +66,39 @@ export default defineSchema({
     premiumEntitlements: v.optional(v.record(v.string(), v.any())), // Active entitlements
     premiumSubscriptions: v.optional(v.record(v.string(), v.any())), // Subscription details
     premiumUpdatedAt: v.optional(v.number()), // Last sync timestamp
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Stripe Payment Integration
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    stripeCustomerId: v.optional(v.string()), // Stripe customer ID
+    stripeSubscriptionId: v.optional(v.string()), // Active Stripe subscription ID
+    subscriptionTier: v.optional(v.union(
+      v.literal("free"),
+      v.literal("premium"),
+      v.literal("agency")
+    )), // Current subscription tier
+    subscriptionStatus: v.optional(v.string()), // Stripe subscription status (active, trialing, past_due, etc.)
+    subscriptionPeriodEnd: v.optional(v.number()), // Current period end timestamp
+    subscriptionCancelAtPeriodEnd: v.optional(v.boolean()), // True if subscription will cancel at period end
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Unified Subscription Tracking
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    subscriptionSource: v.optional(v.union(
+      v.literal("stripe"),
+      v.literal("revenuecat"),
+      v.literal("polar"),
+      v.literal("none")
+    )), // Source of current subscription (for unified tracking)
+    subscriptionSyncedAt: v.optional(v.number()), // Last unified sync timestamp
   })
     .index("email", ["email"])
     .index("memorySpaceId", ["memorySpaceId"])
     .index("revenueCatId", ["revenueCatId"])
-    .index("isPremium", ["isPremium"]),
+    .index("isPremium", ["isPremium"])
+    .index("stripeCustomerId", ["stripeCustomerId"])
+    .index("subscriptionTier", ["subscriptionTier"])
+    .index("subscriptionSource", ["subscriptionSource"]),
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // CORTEX MEMORY LAYER
@@ -721,6 +749,8 @@ export default defineSchema({
       v.literal("unit"),
       v.literal("land"),
       v.literal("studio"),
+      v.literal("commercial"),
+      v.literal("rural"),
     ),
     bedrooms: v.optional(v.number()),
     bathrooms: v.optional(v.number()),
@@ -784,12 +814,26 @@ export default defineSchema({
     .index("by_externalId", ["externalId"])
     .index("by_suburb", ["suburb"])
     .index("by_suburb_status", ["suburb", "status"])
+    .index("by_suburb_state", ["suburb", "state"])
     .index("by_status", ["status"])
     .index("by_price", ["price"])
     .index("by_propertyType", ["propertyType"])
     .index("by_bedrooms", ["bedrooms"])
+    .index("by_bathrooms", ["bathrooms"])
     .index("by_listingDate", ["listingDate"])
-    .index("by_fetchedAt", ["fetchedAt"]),
+    .index("by_fetchedAt", ["fetchedAt"])
+    // Compound indexes for efficient filtering
+    .index("by_status_price", ["status", "price"])
+    .index("by_status_propertyType", ["status", "propertyType"])
+    .index("by_status_bedrooms", ["status", "bedrooms"])
+    .index("by_suburb_status_price", ["suburb", "status", "price"])
+    .index("by_propertyType_status_price", ["propertyType", "status", "price"])
+    .index("by_state_suburb_status", ["state", "suburb", "status"])
+    // Search index for full-text search
+    .searchIndex("search_properties", {
+      searchField: "address",
+      filterFields: ["suburb", "state", "propertyType", "status", "bedrooms", "bathrooms", "price"],
+    }),
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // MIGRATED: Collaborative Rooms (merged from source rooms)
@@ -942,4 +986,343 @@ export default defineSchema({
     .index("by_analysisStatus", ["analysis.status"])
     .index("by_sourceType", ["sourceType"])
     .index("by_uploadedAt", ["uploadedAt"]),
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MIGRATED: Properties (simple property table from source)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Note: This is a simplified table for backward compatibility.
+  // New code should use propertyListings for comprehensive property data.
+  properties: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    price: v.number(),
+    bedrooms: v.number(),
+    bathrooms: v.number(),
+    location: v.string(),
+    imageUrl: v.optional(v.string()),
+    features: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_createdAt", ["createdAt"])
+    .index("by_location", ["location"])
+    .index("by_price", ["price"]),
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MIGRATED: Request Intros (property inquiry requests)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  requestIntros: defineTable({
+    propertyId: v.optional(v.string()),
+    name: v.string(),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    message: v.string(),
+    status: v.union(v.literal("pending"), v.literal("contacted"), v.literal("completed")),
+    createdAt: v.number(),
+  })
+    .index("by_propertyId", ["propertyId"])
+    .index("by_email", ["email"])
+    .index("by_status", ["status"])
+    .index("by_createdAt", ["createdAt"]),
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MIGRATED: User Preferences (favorites and search filters)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Note: User preferences also exist in the users table. This table
+  // provides structured access to favorites and search filters.
+  userPreferences: defineTable({
+    userId: v.string(),
+    favoriteProperties: v.optional(v.array(v.string())),
+    searchFilters: v.optional(v.object({
+      minPrice: v.optional(v.number()),
+      maxPrice: v.optional(v.number()),
+      bedrooms: v.optional(v.number()),
+      bathrooms: v.optional(v.number()),
+      location: v.optional(v.string()),
+    })),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_updatedAt", ["updatedAt"]),
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MIGRATED: Room Presence (realtime collaboration tracking)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Note: Links to collaborativeRooms table for presence tracking
+  roomPresence: defineTable({
+    roomId: v.string(), // References collaborativeRooms.roomId
+    userId: v.string(),
+    userName: v.string(),
+    lastSeen: v.number(),
+  })
+    .index("by_room", ["roomId"])
+    .index("by_userId", ["userId"])
+    .index("by_lastSeen", ["lastSeen"]),
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MIGRATION: HAUS Platform Tables (from source repository)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  // DUD Reports (Trust/Safety Database)
+  dudReports: defineTable({
+    reportNumber: v.optional(v.number()),
+    name: v.string(),
+    slug: v.string(),
+    category: v.string(),
+    country: v.optional(v.string()),
+    region: v.optional(v.string()),
+    location: v.string(),
+    rating: v.number(),
+    reviewCount: v.number(),
+    headline: v.optional(v.string()),
+    riskScore: v.optional(v.number()),
+    riskLevel: v.optional(v.string()),
+    issues: v.array(v.string()),
+    lastReported: v.string(),
+    status: v.string(),
+    regulatorRefs: v.optional(
+      v.array(v.object({ name: v.string(), url: v.optional(v.string()) }))
+    ),
+    nextSteps: v.optional(
+      v.array(v.object({ title: v.string(), description: v.string() }))
+    ),
+    evidence: v.optional(
+      v.array(
+        v.object({
+          id: v.optional(v.string()),
+          dateLabel: v.string(),
+          title: v.string(),
+          description: v.string(),
+          sourceLabel: v.string(),
+          confidence: v.string(),
+        })
+      )
+    ),
+    redFlags: v.optional(
+      v.array(
+        v.object({ label: v.string(), severity: v.string(), icon: v.string() })
+      )
+    ),
+    providerIds: v.optional(v.array(v.id("providers"))),
+    highProfile: v.optional(v.boolean()),
+    caseStudy: v.optional(
+      v.object({
+        title: v.string(),
+        damages: v.string(),
+        inspector: v.string(),
+        videoViews: v.string(),
+        defects: v.number(),
+      })
+    ),
+    blueKeyProperties: v.optional(
+      v.array(
+        v.object({
+          projectName: v.string(),
+          location: v.string(),
+          issues: v.array(v.string()),
+          rating: v.number(),
+        })
+      )
+    ),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_report_number", ["reportNumber"])
+    .index("by_country", ["country"])
+    .index("by_region", ["region"])
+    .index("by_category", ["category"])
+    .index("by_category_country", ["category", "country"])
+    .index("by_high_profile", ["highProfile"]),
+
+  // Providers (Marketplace Service Providers)
+  providers: defineTable({
+    businessName: v.string(),
+    slug: v.string(),
+    category: v.string(),
+    description: v.string(),
+    shortDescription: v.string(),
+    country: v.optional(v.string()),
+    regions: v.optional(v.array(v.string())),
+    rating: v.number(),
+    reviewCount: v.number(),
+    completedJobs: v.number(),
+    responseTime: v.string(),
+    pricing: v.optional(
+      v.object({
+        type: v.string(),
+        startingFrom: v.number(),
+        currency: v.string(),
+      })
+    ),
+    verificationLevel: v.string(),
+    badges: v.array(v.string()),
+    featured: v.optional(v.boolean()),
+    teamSize: v.number(),
+    availableForUrgent: v.optional(v.boolean()),
+    services: v.optional(v.array(v.string())),
+    certifications: v.optional(v.array(v.string())),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_category", ["category"])
+    .index("by_country", ["country"])
+    .index("by_category_country", ["category", "country"])
+    .index("by_verification", ["verificationLevel"])
+    .index("by_featured", ["featured"]),
+
+  // Compass Listings (Map-based Property Search)
+  compassListings: defineTable({
+    title: v.string(),
+    address: v.string(),
+    suburb: v.string(),
+    postcode: v.string(),
+    state: v.string(),
+    coordinates: v.object({ lat: v.number(), lng: v.number() }),
+    price: v.number(),
+    priceLabel: v.string(),
+    listingMode: v.string(),
+    propertyType: v.string(),
+    bedrooms: v.number(),
+    bathrooms: v.number(),
+    parkingSpaces: v.number(),
+    landSize: v.optional(v.number()),
+    images: v.array(v.string()),
+    features: v.array(v.string()),
+    agent: v.object({
+      name: v.string(),
+      agency: v.string(),
+      avatar: v.string(),
+      phone: v.string(),
+    }),
+    isFavorite: v.boolean(),
+    isNew: v.boolean(),
+    isPremium: v.boolean(),
+    rating: v.optional(v.number()),
+    reviewCount: v.optional(v.number()),
+    daysOnMarket: v.number(),
+    inspectionTimes: v.optional(v.array(v.string())),
+    auctionDate: v.optional(v.string()),
+  })
+    .index("by_listingMode", ["listingMode"])
+    .index("by_propertyType", ["propertyType"])
+    .index("by_suburb", ["suburb"])
+    .index("by_price", ["price"]),
+
+  // Market Categories
+  marketCategories: defineTable({
+    id: v.string(),
+    name: v.string(),
+    slug: v.string(),
+    icon: v.string(),
+    description: v.string(),
+    stats: v.optional(
+      v.object({
+        providers: v.number(),
+        avgRating: v.number(),
+        completedJobs: v.number(),
+      })
+    ),
+  }).index("by_slug", ["slug"]),
+
+  // User Progress (Gamification)
+  userProgress: defineTable({
+    userId: v.string(),
+    xp: v.number(),
+    level: v.number(),
+    streak: v.number(),
+    lastActiveDate: v.string(),
+    completedLessons: v.array(v.string()),
+    completedAchievements: v.array(v.string()),
+    stats: v.optional(
+      v.object({
+        propertiesViewed: v.number(),
+        searchesMade: v.number(),
+        reportsGenerated: v.number(),
+        documentsUploaded: v.number(),
+      })
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  // Achievements
+  achievements: defineTable({
+    id: v.string(),
+    title: v.string(),
+    description: v.string(),
+    icon: v.string(),
+    xpReward: v.number(),
+    category: v.string(),
+    requirement: v.object({
+      type: v.string(),
+      target: v.number(),
+      metric: v.optional(v.string()),
+    }),
+  }).index("by_category", ["category"]),
+
+  // Lessons (Academy Content)
+  lessons: defineTable({
+    id: v.string(),
+    title: v.string(),
+    description: v.string(),
+    category: v.string(),
+    duration: v.number(),
+    xpReward: v.number(),
+    order: v.number(),
+    content: v.optional(v.string()),
+    videoUrl: v.optional(v.string()),
+    courseId: v.optional(v.string()),
+  })
+    .index("by_category", ["category"])
+    .index("by_order", ["order"]),
+
+  // Tenders (Document Management)
+  tenders: defineTable({
+    name: v.string(),
+    clientName: v.string(),
+    deadline: v.float64(),
+    value: v.optional(v.float64()),
+    status: v.optional(v.string()),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_clientName", ["clientName"])
+    .index("by_deadline", ["deadline"]),
+
+  // Tender Documents
+  tenderDocuments: defineTable({
+    name: v.string(),
+    tenderId: v.id("tenders"),
+    type: v.string(),
+    content: v.string(),
+    fileUrl: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
+    uploadedAt: v.number(),
+  })
+    .index("by_tenderId", ["tenderId"])
+    .index("by_type", ["type"]),
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Rate Limiting
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  rateLimits: defineTable({
+    // User ID or IP address
+    identifier: v.string(),
+    // Endpoint or action being rate limited (e.g., "ai:chat", "voice:token")
+    endpoint: v.string(),
+    // Request count in current window
+    count: v.number(),
+    // Window start timestamp (ms)
+    windowStart: v.number(),
+    // Window duration (ms)
+    windowMs: v.number(),
+    // When this record was created
+    createdAt: v.number(),
+    // When this record was last updated
+    updatedAt: v.number(),
+  })
+    .index("by_identifier_endpoint", ["identifier", "endpoint"])
+    .index("by_identifier_endpoint_window", ["identifier", "endpoint", "windowStart"])
+    .index("by_windowStart", ["windowStart"]),
 });

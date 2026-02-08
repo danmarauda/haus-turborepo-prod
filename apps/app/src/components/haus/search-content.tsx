@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { Button } from "@v1/ui/button"
 import { Card, CardContent } from "@v1/ui/card"
 import { Badge } from "@v1/ui/badge"
@@ -33,8 +33,9 @@ import {
 import { PropertyCard } from "@/components/haus/property-card"
 import { PropertyDetailModal } from "@/components/haus/property-detail-modal"
 import { VoiceCopilotModal } from "@/components/haus/voice-copilot-modal"
-import { generateMockProperties } from "@/lib/mock-data"
-import type { Property, SearchParameters, VoiceSearchResult } from "@/types/property"
+import { usePropertySearch, formatPrice } from "@/hooks/use-property-search"
+import type { Property, VoiceSearchResult } from "@/types/property"
+import { SearchErrorBoundary } from "@/components/error-boundaries"
 
 // Property type options
 const propertyTypes = [
@@ -94,27 +95,23 @@ const amenityOptions = [
   "Tennis Court",
 ]
 
-export function SearchContent() {
+function SearchContentInner() {
+  // Use the real property search hook
+  const {
+    data: properties,
+    isLoading,
+    error,
+    search,
+    filters,
+    updateFilters,
+    resetFilters,
+    pagination,
+    setPage,
+  } = usePropertySearch()
+
   // View and layout state
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid")
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-
-  // Search and filter state
-  const [searchQuery, setSearchQuery] = useState("")
-  const [location, setLocation] = useState("")
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000])
-  const [bedrooms, setBedrooms] = useState<string>("any")
-  const [bathrooms, setBathrooms] = useState<string>("any")
-  const [propertyType, setPropertyType] = useState<string[]>([])
-  const [listingType, setListingType] = useState<"all" | "for-sale" | "for-rent">("all")
-  const [sortBy, setSortBy] = useState("newest")
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-  const [activePreset, setActivePreset] = useState<string | null>(null)
-
-  // Results state
-  const [properties, setProperties] = useState<Property[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [totalResults, setTotalResults] = useState(0)
 
   // Modal state
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
@@ -124,24 +121,9 @@ export function SearchContent() {
   const [savedSearches, setSavedSearches] = useState<string[]>([])
   const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set())
 
-  // Load initial data
-  useEffect(() => {
-    loadProperties()
-    loadSavedData()
-  }, [])
-
-  const loadProperties = useCallback(() => {
-    setIsLoading(true)
-    // Simulate API call with filters
-    setTimeout(() => {
-      const mockProperties = generateMockProperties({}, 24)
-      setProperties(mockProperties)
-      setTotalResults(mockProperties.length + Math.floor(Math.random() * 200))
-      setIsLoading(false)
-    }, 800)
-  }, [])
-
-  const loadSavedData = () => {
+  // Load saved data on mount
+  const loadSavedData = useCallback(() => {
+    if (typeof window === "undefined") return
     const saved = localStorage.getItem("haus_saved_properties")
     if (saved) {
       setSavedProperties(new Set(JSON.parse(saved)))
@@ -150,101 +132,152 @@ export function SearchContent() {
     if (searches) {
       setSavedSearches(JSON.parse(searches))
     }
-  }
+  }, [])
+
+  // Load saved data once on mount
+  useState(() => {
+    loadSavedData()
+  })
 
   // Handle voice search results
-  const handleVoiceSearchComplete = (result: VoiceSearchResult) => {
-    const params = result.parameters
-    if (params.location) setLocation(params.location)
-    if (params.priceRange) {
-      setPriceRange([params.priceRange.min || 0, params.priceRange.max || 5000000])
-    }
-    if (params.bedrooms) setBedrooms(params.bedrooms.toString())
-    if (params.propertyType) setPropertyType([params.propertyType])
-    if (params.amenities) setSelectedAmenities(params.amenities as string[])
-    loadProperties()
-  }
+  const handleVoiceSearchComplete = useCallback(
+    async (result: VoiceSearchResult) => {
+      const params = result.parameters
+      const newFilters: Parameters<typeof updateFilters>[0] = {}
+
+      if (params.location) {
+        newFilters.location = params.location
+      }
+      if (params.priceRange) {
+        newFilters.priceRange = {
+          min: params.priceRange.min,
+          max: params.priceRange.max,
+        }
+      }
+      if (params.bedrooms !== undefined) {
+        newFilters.bedrooms = params.bedrooms
+      }
+      if (params.propertyType) {
+        newFilters.propertyType = params.propertyType
+      }
+      if (params.amenities) {
+        newFilters.amenities = params.amenities
+      }
+
+      updateFilters(newFilters)
+      await search(newFilters)
+    },
+    [updateFilters, search]
+  )
 
   // Apply preset filters
-  const applyPreset = (presetId: string) => {
-    setActivePreset(presetId === activePreset ? null : presetId)
+  const applyPreset = useCallback(
+    async (presetId: string) => {
+      const isActive = filters.listingType === presetId
 
-    switch (presetId) {
-      case "first-home":
-        setPriceRange([0, 800000])
-        setBedrooms("2")
-        break
-      case "investor":
-        setPriceRange([400000, 1200000])
-        setPropertyType(["apartment", "townhouse"])
-        break
-      case "family":
-        setBedrooms("4")
-        setSelectedAmenities(["Garden", "Garage"])
-        break
-      case "downsizer":
-        setBedrooms("2")
-        setPropertyType(["apartment", "townhouse"])
-        setSelectedAmenities(["Air Conditioning", "Security System"])
-        break
-    }
-    loadProperties()
-  }
+      if (isActive) {
+        // Toggle off
+        updateFilters({ listingType: "all" })
+        await search({ listingType: "all" })
+        return
+      }
+
+      let newFilters: Parameters<typeof updateFilters>[0] = { listingType: presetId as "all" | "for-sale" | "for-rent" }
+
+      switch (presetId) {
+        case "first-home":
+          newFilters = {
+            ...newFilters,
+            priceRange: { min: 0, max: 800000 },
+            bedrooms: 2,
+          }
+          break
+        case "investor":
+          newFilters = {
+            ...newFilters,
+            priceRange: { min: 400000, max: 1200000 },
+            propertyType: "apartment",
+          }
+          break
+        case "family":
+          newFilters = {
+            ...newFilters,
+            bedrooms: 4,
+            amenities: ["Garden", "Garage"],
+          }
+          break
+        case "downsizer":
+          newFilters = {
+            ...newFilters,
+            bedrooms: 2,
+            propertyType: "apartment",
+            amenities: ["Air Conditioning", "Security System"],
+          }
+          break
+      }
+
+      updateFilters(newFilters)
+      await search(newFilters)
+    },
+    [filters.listingType, updateFilters, search]
+  )
 
   // Clear all filters
-  const clearFilters = () => {
-    setSearchQuery("")
-    setLocation("")
-    setPriceRange([0, 5000000])
-    setBedrooms("any")
-    setBathrooms("any")
-    setPropertyType([])
-    setListingType("all")
-    setSelectedAmenities([])
-    setActivePreset(null)
-    loadProperties()
-  }
+  const handleClearFilters = useCallback(async () => {
+    resetFilters()
+    await search({
+      page: 1,
+      pageSize: 24,
+      sortBy: "newest",
+      listingType: "all",
+    })
+  }, [resetFilters, search])
 
   // Count active filters
   const activeFilterCount = useMemo(() => {
     let count = 0
-    if (location) count++
-    if (priceRange[0] > 0 || priceRange[1] < 5000000) count++
-    if (bedrooms !== "any") count++
-    if (bathrooms !== "any") count++
-    if (propertyType.length > 0) count++
-    if (listingType !== "all") count++
-    if (selectedAmenities.length > 0) count++
+    if (filters.location) count++
+    if (filters.priceRange?.min !== undefined || filters.priceRange?.max !== undefined) count++
+    if (filters.bedrooms !== undefined) count++
+    if (filters.bathrooms !== undefined) count++
+    if (filters.propertyType) count++
+    if (filters.listingType && filters.listingType !== "all") count++
+    if (filters.amenities && filters.amenities.length > 0) count++
     return count
-  }, [location, priceRange, bedrooms, bathrooms, propertyType, listingType, selectedAmenities])
+  }, [filters])
 
   // Format price for display
-  const formatPrice = (price: number) => {
+  const formatPriceDisplay = useCallback((price: number) => {
     if (price >= 1000000) {
       return `$${(price / 1000000).toFixed(1)}M`
     }
     return `$${(price / 1000).toFixed(0)}K`
-  }
+  }, [])
 
   // Handle property interactions
-  const handlePropertyClick = (property: Property) => {
+  const handlePropertyClick = useCallback((property: Property) => {
     setSelectedProperty(property)
     setIsModalOpen(true)
-  }
+  }, [])
 
-  const handleFavorite = (propertyId: string) => {
-    const newSaved = new Set(savedProperties)
-    if (newSaved.has(propertyId)) {
-      newSaved.delete(propertyId)
-    } else {
-      newSaved.add(propertyId)
-    }
-    setSavedProperties(newSaved)
-    localStorage.setItem("haus_saved_properties", JSON.stringify([...newSaved]))
-  }
+  const handleFavorite = useCallback(
+    (propertyId: string) => {
+      const newSaved = new Set(savedProperties)
+      if (newSaved.has(propertyId)) {
+        newSaved.delete(propertyId)
+      } else {
+        newSaved.add(propertyId)
+      }
+      setSavedProperties(newSaved)
+      if (typeof window !== "undefined") {
+        localStorage.setItem("haus_saved_properties", JSON.stringify([...newSaved]))
+      }
+    },
+    [savedProperties]
+  )
 
-  const handleShare = (property: Property) => {
-    if (navigator.share) {
+  const handleShare = useCallback((property: Property) => {
+    if (typeof window !== "undefined" && navigator.share) {
       navigator
         .share({
           title: property.title,
@@ -255,34 +288,74 @@ export function SearchContent() {
           // User cancelled share - this is expected behavior
         })
     }
-  }
+  }, [])
 
   // Save current search
-  const saveCurrentSearch = () => {
+  const saveCurrentSearch = useCallback(() => {
     const searchConfig = {
-      location,
-      priceRange,
-      bedrooms,
-      bathrooms,
-      propertyType,
-      listingType,
-      amenities: selectedAmenities,
+      location: filters.location,
+      priceRange: filters.priceRange,
+      bedrooms: filters.bedrooms,
+      bathrooms: filters.bathrooms,
+      propertyType: filters.propertyType,
+      listingType: filters.listingType,
+      amenities: filters.amenities,
       timestamp: new Date().toISOString(),
     }
     const newSearches = [...savedSearches, JSON.stringify(searchConfig)]
     setSavedSearches(newSearches)
-    localStorage.setItem("haus_saved_searches", JSON.stringify(newSearches))
-  }
+    if (typeof window !== "undefined") {
+      localStorage.setItem("haus_saved_searches", JSON.stringify(newSearches))
+    }
+  }, [filters, savedSearches])
+
+  // Handle sort change
+  const handleSortChange = useCallback(
+    async (value: string) => {
+      const newFilters = { sortBy: value as typeof filters.sortBy }
+      updateFilters(newFilters)
+      await search(newFilters)
+    },
+    [updateFilters, search]
+  )
+
+  // Handle search button click
+  const handleSearch = useCallback(async () => {
+    await search()
+  }, [search])
+
+  // Handle load more
+  const handleLoadMore = useCallback(async () => {
+    await setPage(pagination.page + 1)
+  }, [setPage, pagination.page])
+
+  // Get current price range for display
+  const currentPriceRange = useMemo<[number, number]>(() => {
+    const min = filters.priceRange?.min ?? 0
+    const max = filters.priceRange?.max ?? 5000000
+    return [min, max]
+  }, [filters.priceRange])
+
+  // Get current bedrooms display value
+  const currentBedrooms = useMemo(() => {
+    if (filters.bedrooms === undefined) return "any"
+    if (filters.bedrooms >= 5) return "5+"
+    return String(filters.bedrooms)
+  }, [filters.bedrooms])
+
+  // Get current bathrooms display value
+  const currentBathrooms = useMemo(() => {
+    if (filters.bathrooms === undefined) return "any"
+    if (filters.bathrooms >= 4) return "4+"
+    return String(filters.bathrooms)
+  }, [filters.bathrooms])
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       {/* Embedded Voice Search */}
       <section className="mb-8">
         <div className="relative overflow-hidden rounded-[32px] border border-border bg-zinc-950 dark:border-white/10 min-h-[500px]">
-          <VoiceCopilotModal
-            onResults={handleVoiceSearchComplete}
-            onClose={() => {}}
-          />
+          <VoiceCopilotModal onResults={handleVoiceSearchComplete} onClose={() => {}} />
         </div>
       </section>
 
@@ -299,20 +372,21 @@ export function SearchContent() {
                 <Input
                   type="text"
                   placeholder="Search by suburb, postcode, or keyword..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={filters.query || ""}
+                  onChange={(e) => updateFilters({ query: e.target.value })}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   className="pl-12 pr-4 h-14 text-lg rounded-2xl border-white/10 bg-white/5 focus:bg-white/10 transition-colors"
                 />
               </div>
 
               {/* Location Select */}
-              <Select value={location} onValueChange={setLocation}>
+              <Select value={filters.location || ""} onValueChange={(value) => updateFilters({ location: value })}>
                 <SelectTrigger className="w-full lg:w-64 h-14 rounded-2xl border-white/10 bg-white/5">
                   <MapPin className="w-4 h-4 mr-2 text-muted-foreground" />
                   <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
+                  <SelectItem value="">All Locations</SelectItem>
                   {australianCities.map((city) => (
                     <SelectItem key={city} value={city}>
                       {city}
@@ -325,9 +399,10 @@ export function SearchContent() {
               <Button
                 size="lg"
                 className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-white/90"
-                onClick={loadProperties}
+                onClick={handleSearch}
+                disabled={isLoading}
               >
-                Search
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Search"}
               </Button>
             </div>
 
@@ -335,7 +410,7 @@ export function SearchContent() {
             <div className="mt-6 flex flex-wrap gap-3">
               {filterPresets.map((preset) => {
                 const Icon = preset.icon
-                const isActive = activePreset === preset.id
+                const isActive = filters.listingType === preset.id
                 return (
                   <Button
                     key={preset.id}
@@ -367,9 +442,11 @@ export function SearchContent() {
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Searching...
                 </span>
+              ) : error ? (
+                <span className="text-destructive">Error loading properties</span>
               ) : (
                 <span>
-                  <strong className="text-foreground">{totalResults.toLocaleString()}</strong> properties found
+                  <strong className="text-foreground">{pagination.totalCount.toLocaleString()}</strong> properties found
                 </span>
               )}
             </div>
@@ -377,53 +454,65 @@ export function SearchContent() {
             {/* Active filter chips */}
             {activeFilterCount > 0 && (
               <div className="flex items-center gap-2 flex-wrap">
-                {location && (
+                {filters.location && (
                   <Badge variant="secondary" className="rounded-full gap-1 pr-1">
-                    {location}
+                    {filters.location}
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => setLocation("")}
+                      onClick={() => {
+                        updateFilters({ location: undefined })
+                        search({ location: undefined })
+                      }}
                     >
                       <X className="w-3 h-3" />
                     </Button>
                   </Badge>
                 )}
-                {(priceRange[0] > 0 || priceRange[1] < 5000000) && (
+                {(filters.priceRange?.min !== undefined || filters.priceRange?.max !== undefined) && (
                   <Badge variant="secondary" className="rounded-full gap-1 pr-1">
-                    {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
+                    {formatPriceDisplay(filters.priceRange?.min || 0)} - {formatPriceDisplay(filters.priceRange?.max || 5000000)}
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => setPriceRange([0, 5000000])}
+                      onClick={() => {
+                        updateFilters({ priceRange: undefined })
+                        search({ priceRange: undefined })
+                      }}
                     >
                       <X className="w-3 h-3" />
                     </Button>
                   </Badge>
                 )}
-                {bedrooms !== "any" && (
+                {filters.bedrooms !== undefined && (
                   <Badge variant="secondary" className="rounded-full gap-1 pr-1">
-                    {bedrooms}+ beds
+                    {currentBedrooms}+ beds
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => setBedrooms("any")}
+                      onClick={() => {
+                        updateFilters({ bedrooms: undefined })
+                        search({ bedrooms: undefined })
+                      }}
                     >
                       <X className="w-3 h-3" />
                     </Button>
                   </Badge>
                 )}
-                {propertyType.length > 0 && (
+                {filters.propertyType && (
                   <Badge variant="secondary" className="rounded-full gap-1 pr-1">
-                    {propertyType.length} types
+                    {filters.propertyType}
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => setPropertyType([])}
+                      onClick={() => {
+                        updateFilters({ propertyType: undefined })
+                        search({ propertyType: undefined })
+                      }}
                     >
                       <X className="w-3 h-3" />
                     </Button>
@@ -433,7 +522,7 @@ export function SearchContent() {
                   variant="ghost"
                   size="sm"
                   className="text-muted-foreground hover:text-foreground gap-1"
-                  onClick={clearFilters}
+                  onClick={handleClearFilters}
                 >
                   <RotateCcw className="w-3 h-3" />
                   Clear all
@@ -456,7 +545,7 @@ export function SearchContent() {
             </Button>
 
             {/* Sort */}
-            <Select value={sortBy} onValueChange={setSortBy}>
+            <Select value={filters.sortBy || "newest"} onValueChange={handleSortChange}>
               <SelectTrigger className="w-[180px] rounded-full border-border bg-transparent">
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 <SelectValue />
@@ -523,16 +612,20 @@ export function SearchContent() {
                     <Label className="text-base font-medium">Price Range</Label>
                     <div className="px-2">
                       <Slider
-                        value={priceRange}
+                        value={currentPriceRange}
                         min={0}
                         max={5000000}
                         step={50000}
-                        onValueChange={(value) => setPriceRange(value as [number, number])}
+                        onValueChange={(value) => {
+                          updateFilters({
+                            priceRange: { min: value[0], max: value[1] },
+                          })
+                        }}
                         className="mb-4"
                       />
                       <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{formatPrice(priceRange[0])}</span>
-                        <span>{formatPrice(priceRange[1])}</span>
+                        <span>{formatPriceDisplay(currentPriceRange[0])}</span>
+                        <span>{formatPriceDisplay(currentPriceRange[1])}</span>
                       </div>
                     </div>
                   </div>
@@ -547,9 +640,9 @@ export function SearchContent() {
                           variant="outline"
                           size="sm"
                           className={`flex-1 rounded-full ${
-                            listingType === type ? "bg-primary text-primary-foreground border-primary" : ""
+                            filters.listingType === type ? "bg-primary text-primary-foreground border-primary" : ""
                           }`}
-                          onClick={() => setListingType(type as typeof listingType)}
+                          onClick={() => updateFilters({ listingType: type as typeof filters.listingType })}
                         >
                           {type === "all" ? "All" : type === "for-sale" ? "Buy" : "Rent"}
                         </Button>
@@ -563,20 +656,16 @@ export function SearchContent() {
                     <div className="grid grid-cols-2 gap-2">
                       {propertyTypes.map((type) => {
                         const Icon = type.icon
-                        const isSelected = propertyType.includes(type.id)
+                        const isSelected = filters.propertyType === type.id
                         return (
                           <Button
                             key={type.id}
                             variant="outline"
                             size="sm"
                             className={`justify-start gap-2 ${isSelected ? "bg-primary/20 border-primary" : ""}`}
-                            onClick={() => {
-                              if (isSelected) {
-                                setPropertyType(propertyType.filter((t) => t !== type.id))
-                              } else {
-                                setPropertyType([...propertyType, type.id])
-                              }
-                            }}
+                            onClick={() =>
+                              updateFilters({ propertyType: isSelected ? undefined : (type.id as typeof filters.propertyType) })
+                            }
                           >
                             <Icon className="w-4 h-4" />
                             {type.label}
@@ -596,9 +685,13 @@ export function SearchContent() {
                           variant="outline"
                           size="sm"
                           className={`flex-1 rounded-full ${
-                            bedrooms === num ? "bg-primary text-primary-foreground border-primary" : ""
+                            currentBedrooms === num ? "bg-primary text-primary-foreground border-primary" : ""
                           }`}
-                          onClick={() => setBedrooms(num)}
+                          onClick={() =>
+                            updateFilters({
+                              bedrooms: num === "any" ? undefined : num === "5+" ? 5 : Number.parseInt(num),
+                            })
+                          }
                         >
                           {num === "any" ? "Any" : num}
                         </Button>
@@ -616,9 +709,13 @@ export function SearchContent() {
                           variant="outline"
                           size="sm"
                           className={`flex-1 rounded-full ${
-                            bathrooms === num ? "bg-primary text-primary-foreground border-primary" : ""
+                            currentBathrooms === num ? "bg-primary text-primary-foreground border-primary" : ""
                           }`}
-                          onClick={() => setBathrooms(num)}
+                          onClick={() =>
+                            updateFilters({
+                              bathrooms: num === "any" ? undefined : num === "4+" ? 4 : Number.parseInt(num),
+                            })
+                          }
                         >
                           {num === "any" ? "Any" : num}
                         </Button>
@@ -634,12 +731,13 @@ export function SearchContent() {
                         <div key={amenity} className="flex items-center space-x-2">
                           <Checkbox
                             id={amenity}
-                            checked={selectedAmenities.includes(amenity)}
+                            checked={filters.amenities?.includes(amenity) ?? false}
                             onCheckedChange={(checked) => {
+                              const currentAmenities = filters.amenities || []
                               if (checked) {
-                                setSelectedAmenities([...selectedAmenities, amenity])
+                                updateFilters({ amenities: [...currentAmenities, amenity] })
                               } else {
-                                setSelectedAmenities(selectedAmenities.filter((a) => a !== amenity))
+                                updateFilters({ amenities: currentAmenities.filter((a) => a !== amenity) })
                               }
                             }}
                           />
@@ -653,13 +751,13 @@ export function SearchContent() {
 
                   {/* Apply Filters */}
                   <div className="flex gap-3 pt-4">
-                    <Button variant="outline" className="flex-1 bg-transparent" onClick={clearFilters}>
+                    <Button variant="outline" className="flex-1 bg-transparent" onClick={handleClearFilters}>
                       Clear All
                     </Button>
                     <Button
                       className="flex-1"
                       onClick={() => {
-                        loadProperties()
+                        search()
                         setIsFiltersOpen(false)
                       }}
                     >
@@ -672,6 +770,19 @@ export function SearchContent() {
           </div>
         </div>
       </section>
+
+      {/* Error State */}
+      {error && (
+        <section className="mb-8">
+          <div className="rounded-2xl border border-destructive/50 bg-destructive/10 p-6 text-center">
+            <p className="text-destructive font-medium">Failed to load properties</p>
+            <p className="text-muted-foreground text-sm mt-1">{error.message}</p>
+            <Button variant="outline" size="sm" className="mt-4" onClick={() => search()}>
+              Try Again
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* Results Grid */}
       <section className="mb-12">
@@ -719,27 +830,31 @@ export function SearchContent() {
       {/* Load More */}
       {!isLoading && properties.length > 0 && (
         <section className="text-center mb-12">
-          <Button
-            variant="outline"
-            size="lg"
-            className="rounded-full border-border bg-transparent px-8"
-            onClick={loadProperties}
-          >
-            Load More Properties
-          </Button>
+          {pagination.hasMore ? (
+            <Button
+              variant="outline"
+              size="lg"
+              className="rounded-full border-border bg-transparent px-8"
+              onClick={handleLoadMore}
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Load More Properties
+            </Button>
+          ) : null}
           <p className="text-sm text-muted-foreground mt-3">
-            Showing {properties.length} of {totalResults.toLocaleString()} properties
+            Showing {properties.length} of {pagination.totalCount.toLocaleString()} properties
           </p>
         </section>
       )}
 
       {/* Empty State */}
-      {!isLoading && properties.length === 0 && (
+      {!isLoading && properties.length === 0 && !error && (
         <div className="text-center py-16">
           <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
           <h3 className="text-xl font-medium mb-2">No properties found</h3>
           <p className="text-muted-foreground mb-6">Try adjusting your filters or search criteria</p>
-          <Button onClick={clearFilters}>Clear All Filters</Button>
+          <Button onClick={handleClearFilters}>Clear All Filters</Button>
         </div>
       )}
 
@@ -753,5 +868,22 @@ export function SearchContent() {
         }}
       />
     </main>
+  )
+}
+
+export function SearchContent() {
+  return (
+    <SearchErrorBoundary
+      onReset={() => {
+        // Reset logic handled by the hook
+        console.log('Search error boundary reset')
+      }}
+      onClearFilters={() => {
+        // Clear filters logic
+        console.log('Clear filters from error boundary')
+      }}
+    >
+      <SearchContentInner />
+    </SearchErrorBoundary>
   )
 }

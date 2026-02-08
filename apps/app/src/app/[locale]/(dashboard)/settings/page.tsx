@@ -3,7 +3,6 @@
 import { useScopedI18n } from "@/locales/client";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { api } from "@v1/backend/convex/_generated/api";
 import type { Id } from "@v1/backend/convex/_generated/dataModel";
 import * as validators from "@v1/backend/convex/utils/validators";
@@ -42,7 +41,6 @@ export default function DashboardSettings() {
   };
 
   const usernameForm = useForm({
-    validatorAdapter: zodValidator(),
     defaultValues: {
       username: user?.username,
     },
@@ -152,9 +150,9 @@ export default function DashboardSettings() {
               />
             )}
           />
-          {usernameForm.state.fieldMeta.username?.errors.length > 0 && (
+          {(usernameForm.state.fieldMeta.username?.errors?.length ?? 0) > 0 && (
             <p className="text-sm text-destructive dark:text-destructive-foreground">
-              {usernameForm.state.fieldMeta.username?.errors.join(" ")}
+              {usernameForm.state.fieldMeta.username?.errors?.join(" ") ?? ""}
             </p>
           )}
         </div>

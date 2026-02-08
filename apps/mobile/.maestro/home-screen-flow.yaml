@@ -1,0 +1,25 @@
+# MAESTRO FLOW: Home Screen Navigation
+# Tests the home tab navigation and key features
+
+appId: com.aliaslabs.haus
+---
+- launchApp
+# Wait for app to load
+- waitForAnimationToEnd
+# Navigate to home if on landing page
+- tryTo:
+    tapOn: "HAUS Voice Agent"
+# Verify home screen elements
+- assertVisible: "HAUS"
+- assertVisible: "Find Your Dream Australian Home"
+- assertVisible: "Start Searching"
+- assertVisible: "Why Choose HAUS"
+- assertVisible: "AI-Powered Matching"
+- assertVisible: "Exclusive Listings"
+- assertVisible: "Local Expertise"
+- assertVisible: "Featured Properties"
+# Test "Start Searching" button
+- tapOn: "Start Searching"
+# Should navigate to search screen
+- waitForAnimationToEnd
+- assertVisible: "Search"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../services/auth/useAuth';
 import { MessageSquare } from 'lucide-react-native';
 import { registerGlobals } from '@livekit/react-native';
 import { LiveKitRoom, RoomAudioRenderer, useVoiceAssistant } from '@livekit/components-react';
@@ -14,44 +15,65 @@ import { useVoiceTranscription } from '../../hooks/useVoiceTranscription';
 import { useCortexMemory, useConversationMemory } from '../../hooks/useCortexMemory';
 import type { RecallResult } from '../../hooks/useCortexMemory';
 import { MemoryContextPanel, MemoryQuickSummary } from '../../components/memory';
+import VoiceErrorBoundary from '../../components/error-boundaries/VoiceErrorBoundary';
 
 // Register LiveKit globals once
 registerGlobals();
 
 const convex = new ConvexClient(process.env.EXPO_PUBLIC_CONVEX_URL || '');
 
-// Get user ID - in production this would come from auth
-const getUserId = () => {
-  return 'mobile-user-' + (Math.random().toString(36).substring(2, 10));
-};
-
-const userId = getUserId();
-
-export default function VoiceScreen() {
+function VoiceScreenContent() {
   const [token, setToken] = useState<string | null>(null);
   const [agentState, setAgentState] = useState<AgentState>('disconnected');
   const [error, setError] = useState<string | null>(null);
   const [memoryContext, setMemoryContext] = useState<RecallResult | null>(null);
   const { isMuted, toggleMute, startRecording, stopRecording } = useMicrophoneControl();
+  const { isAuthenticated, isLoading: isAuthLoading, userId } = useAuth();
+  const router = useRouter();
 
-  // Cortex memory integration
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      router.replace('/(auth)/login');
+    }
+  }, [isAuthLoading, isAuthenticated, router]);
+
+  // Cortex memory integration - only enabled when we have a userId
   const cortex = useCortexMemory({
     convex,
-    userId,
-    enabled: true,
+    userId: userId || '',
+    enabled: !!userId,
   });
 
   const conversationMemory = useConversationMemory({
     convex,
-    userId,
-    enabled: true,
+    userId: userId || '',
+    enabled: !!userId,
     onConversationStored: (conversationId) => {
       // Conversation stored successfully
       // Could trigger UI update or analytics here
     },
   });
 
-  const router = useRouter();
+  // Show loading state while checking auth
+  if (isAuthLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <LivekitOrb state="connecting" size="md" />
+        <Text style={styles.loadingText}>Checking authentication...</Text>
+      </View>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated || !userId) {
+    return (
+      <View style={styles.loadingContainer}>
+        <LivekitOrb state="connecting" size="md" />
+        <Text style={styles.loadingText}>Redirecting to login...</Text>
+      </View>
+    );
+  }
 
   // Handle switching to text chat
   const handleSwitchToText = useCallback(() => {
@@ -65,7 +87,7 @@ export default function VoiceScreen() {
         setError(null);
         setAgentState('connecting');
         // Call the HTTP endpoint via fetch
-        const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL || '';
+        const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL!;
         const response = await fetch(`${convexUrl}/voice/token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -119,7 +141,7 @@ export default function VoiceScreen() {
       {token ? (
         <LiveKitRoom
           token={token}
-          serverUrl={process.env.EXPO_PUBLIC_LIVEKIT_URL || 'wss://livekit.example.com'}
+          serverUrl={process.env.EXPO_PUBLIC_LIVEKIT_URL!}
           connect={true}
           audio={true}
           video={false}
@@ -371,6 +393,29 @@ function VoiceContent({
       {/* Audio Renderer (required) */}
       <RoomAudioRenderer />
     </SafeAreaView>
+  );
+}
+
+// Export wrapped component with error boundary
+export default function VoiceScreen() {
+  const router = useRouter();
+  
+  return (
+    <VoiceErrorBoundary
+      onReset={() => {
+        // Reset any voice-specific state if needed
+        console.log('Voice error boundary reset');
+      }}
+      onSwitchToText={() => {
+        router.push('/ai-chat');
+      }}
+      onEndCall={() => {
+        // Navigate back or to home
+        router.back();
+      }}
+    >
+      <VoiceScreenContent />
+    </VoiceErrorBoundary>
   );
 }
 

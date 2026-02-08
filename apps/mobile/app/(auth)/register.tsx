@@ -1,29 +1,15 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, User } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { useAuth } from '@/services/auth';
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { signUp, isLoading } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const { signInWithGoogle, isLoading } = useAuth();
 
-  const handleRegister = async () => {
-    // Basic validation
-    if (!name || !email || !password) {
-      return;
-    }
-
-    if (password.length < 8) {
-      return;
-    }
-
-    await signUp({ email, password, name });
+  const handleGoogleSignIn = async () => {
+    await signInWithGoogle();
   };
 
   return (
@@ -47,98 +33,25 @@ export default function RegisterScreen() {
               Join Haus to find your perfect property
             </Text>
 
-            {/* Form */}
-            <View className="gap-4">
-              {/* Name */}
-              <View>
-                <Text className="text-sm font-medium mb-2">Full Name</Text>
-                <View className="flex-row items-center bg-muted rounded-xl px-4 py-3">
-                  <User size={20} color="#666" />
-                  <TextInput
-                    className="flex-1 ml-3 text-base"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChangeText={setName}
-                    autoCapitalize="words"
-                    placeholderTextColor="#999"
-                  />
-                </View>
-              </View>
+            {/* Google Sign In */}
+            <Pressable
+              onPress={handleGoogleSignIn}
+              disabled={isLoading}
+              className={`bg-white border border-border py-4 rounded-xl flex-row items-center justify-center ${isLoading ? 'opacity-50' : ''}`}
+            >
+              <Text className="text-lg mr-2">G</Text>
+              <Text className="font-semibold">
+                {isLoading ? 'Creating account...' : 'Continue with Google'}
+              </Text>
+            </Pressable>
 
-              {/* Email */}
-              <View>
-                <Text className="text-sm font-medium mb-2">Email</Text>
-                <View className="flex-row items-center bg-muted rounded-xl px-4 py-3">
-                  <Mail size={20} color="#666" />
-                  <TextInput
-                    className="flex-1 ml-3 text-base"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    placeholderTextColor="#999"
-                  />
-                </View>
-              </View>
-
-              {/* Password */}
-              <View>
-                <Text className="text-sm font-medium mb-2">Password</Text>
-                <View className="flex-row items-center bg-muted rounded-xl px-4 py-3">
-                  <Lock size={20} color="#666" />
-                  <TextInput
-                    className="flex-1 ml-3 text-base"
-                    placeholder="Create a password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                    placeholderTextColor="#999"
-                  />
-                  <Pressable onPress={() => setShowPassword(!showPassword)}>
-                    {showPassword ? (
-                      <EyeOff size={20} color="#666" />
-                    ) : (
-                      <Eye size={20} color="#666" />
-                    )}
-                  </Pressable>
-                </View>
-                <Text className="text-muted-foreground text-sm mt-2">
-                  Must be at least 8 characters
-                </Text>
-              </View>
-
-              {/* Terms */}
-              <Text className="text-muted-foreground text-sm">
+            {/* Terms */}
+            <View className="mt-6 px-4">
+              <Text className="text-center text-sm text-muted-foreground">
                 By creating an account, you agree to our{' '}
                 <Text className="text-primary">Terms of Service</Text> and{' '}
                 <Text className="text-primary">Privacy Policy</Text>
               </Text>
-
-              {/* Sign Up Button */}
-              <Pressable
-                onPress={handleRegister}
-                disabled={isLoading}
-                className={`bg-primary py-4 rounded-xl mt-4 ${isLoading ? 'opacity-50' : ''}`}
-              >
-                <Text className="text-primary-foreground font-semibold text-center text-base">
-                  {isLoading ? 'Creating account...' : 'Create Account'}
-                </Text>
-              </Pressable>
-
-              {/* Divider */}
-              <View className="flex-row items-center my-4">
-                <View className="flex-1 h-px bg-border" />
-                <Text className="mx-4 text-muted-foreground">or</Text>
-                <View className="flex-1 h-px bg-border" />
-              </View>
-
-              {/* Google Sign In */}
-              <Pressable className="bg-white border border-border py-4 rounded-xl flex-row items-center justify-center">
-                <Text className="text-lg mr-2">G</Text>
-                <Text className="font-semibold">Continue with Google</Text>
-              </Pressable>
             </View>
 
             {/* Sign In Link */}

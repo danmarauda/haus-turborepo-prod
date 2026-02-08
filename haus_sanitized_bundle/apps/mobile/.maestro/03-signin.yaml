@@ -1,0 +1,32 @@
+---
+# HAUS Mobile - Sign In Flow Test
+# Tests existing user authentication
+
+appId: com.haus.app
+---
+- launchApp
+
+# Already on sign in screen (default)
+- assertVisible: "Welcome back"
+- assertVisible: "Sign in to continue to HAUS"
+
+# Enter credentials
+- tapOn: "emailInput"
+- inputText: "test@haus.com"
+
+- tapOn: "passwordInput"
+- inputText: "TestPassword123!"
+
+# Submit sign in
+- tapOn: "Sign In"
+- waitForAnimationToEnd
+
+# Should navigate to tabs
+- assertVisible: "Home"
+- assertVisible: "Search"
+- assertVisible: "Market"
+
+# Verify auth state - go to profile
+- tapOn: "Profile"
+- assertVisible: "Test User" # or username
+- assertVisible: "test@haus.com" # email display

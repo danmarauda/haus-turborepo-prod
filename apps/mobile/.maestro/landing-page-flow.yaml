@@ -1,0 +1,32 @@
+# MAESTRO FLOW: Landing Page to Home Navigation
+# Tests the initial user flow from landing page to main app
+
+appId: com.aliaslabs.haus
+---
+- launchApp
+- assertVisible: "HAUS"
+- assertVisible: "Australian Real Estate Platform"
+- assertVisible: "Find Your Dream Australian Home"
+- assertVisible: "AI-powered property search with voice assistance"
+- assertVisible: "Why Choose HAUS"
+- assertVisible:
+    text: "AI-Powered Matching"
+- assertVisible:
+    text: "Exclusive Listings"
+- assertVisible:
+    text: "Local Expertise"
+- assertVisible:
+    text: "Market Analytics"
+- assertVisible: "HAUS in Numbers"
+- assertVisible:
+    text: "50K+"
+- assertVisible:
+    text: "100+"
+- assertVisible:
+    text: "98%"
+- assertVisible: "HAUS Voice Agent"
+- assertVisible: "Tap to enter the platform"
+- tapOn:
+    text: "HAUS Voice Agent"
+- assertVisible: "Find Your Dream Australian Home"
+- assertVisible: "Start Searching"

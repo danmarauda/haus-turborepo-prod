@@ -1,0 +1,76 @@
+{
+  "app": {
+    "name": "HAUS",
+    "tagline": "Intelligence Immobilière par l'IA"
+  },
+  "tabs": {
+    "home": "Accueil",
+    "search": "Recherche",
+    "compass": "Boussole",
+    "saved": "Enregistrés",
+    "profile": "Profil"
+  },
+  "auth": {
+    "signIn": "Se Connecter",
+    "signUp": "S'inscrire",
+    "signOut": "Se Déconnecter",
+    "email": "Email",
+    "password": "Mot de Passe",
+    "forgotPassword": "Mot de Passe Oublié?",
+    "resetPassword": "Réinitialiser le Mot de Passe",
+    "noAccount": "Pas de compte?",
+    "hasAccount": "Vous avez déjà un compte?",
+    "signInError": "Email ou mot de passe invalide",
+    "signUpError": "Échec de la création du compte",
+    "signInSuccess": "Bon retour!",
+    "signUpSuccess": "Compte créé avec succès"
+  },
+  "search": {
+    "title": "Recherche de Propriété",
+    "placeholder": "Décrivez votre propriété idéale...",
+    "listening": "Écoute...",
+    "processing": "Traitement...",
+    "filters": "Filtres",
+    "results": "Résultats",
+    "noResults": "Aucune propriété trouvée",
+    "tryDifferent": "Essayez d'autres termes de recherche"
+  },
+  "property": {
+    "title": "Détails de la Propriété",
+    "price": "Prix",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de Bain",
+    "parking": "Stationnement",
+    "landSize": "Superficie du Terrain",
+    "description": "Description",
+    "features": "Caractéristiques",
+    "location": "Emplacement",
+    "save": "Enregistrer la Propriété",
+    "unsave": "Supprimer",
+    "contact": "Contacter l'Agent",
+    "tour": "Réserver une Visite",
+    "saved": "Propriété enregistrée",
+    "unsaved": "Propriété supprimée"
+  },
+  "voice": {
+    "tapToSpeak": "Appuyez pour parler",
+    "listening": "Écoute...",
+    "processing": "Traitement...",
+    "error": "Impossible de comprendre. Veuillez réessayer.",
+    "microphonePermission": "L'autorisation du microphone est requise pour la recherche vocale."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé"
+  }
+}

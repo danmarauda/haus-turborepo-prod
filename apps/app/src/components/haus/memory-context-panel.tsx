@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { MemoryErrorBoundary } from "@/components/error-boundaries"
 import type {
   SuburbPreference,
   VoiceFact,
@@ -31,7 +32,7 @@ interface MemoryContextPanelProps {
   className?: string
 }
 
-export function MemoryContextPanel({
+function MemoryContextPanelInner({
   suburbPreferences,
   facts,
   propertyInteractions,

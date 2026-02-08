@@ -3,7 +3,8 @@ import '../global.css';
 import '@/config/i18n';
 
 import React, { useEffect } from 'react';
-import { ConvexProvider } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
+import * as SecureStore from 'expo-secure-store';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AppState, View, Pressable } from 'react-native';
@@ -173,7 +174,14 @@ export default Sentry.wrap
               <FavoritesProvider>
                 <RealtimeFiltersProvider>
                   <QueryClientProvider client={queryClient}>
-                    <ConvexProvider client={convex}>
+                    <ConvexAuthProvider
+                      client={convex}
+                      storage={{
+                        getItem: async (key: string) => SecureStore.getItemAsync(key),
+                        setItem: async (key: string, value: string) => SecureStore.setItemAsync(key, value),
+                        removeItem: async (key: string) => SecureStore.deleteItemAsync(key),
+                      }}
+                    >
                       <AuthProvider>
                         <RevenueCatProvider>
                           <ExpoStripeProvider>
@@ -181,7 +189,7 @@ export default Sentry.wrap
                           </ExpoStripeProvider>
                         </RevenueCatProvider>
                       </AuthProvider>
-                    </ConvexProvider>
+                    </ConvexAuthProvider>
                   </QueryClientProvider>
                 </RealtimeFiltersProvider>
               </FavoritesProvider>
@@ -198,7 +206,14 @@ export default Sentry.wrap
               <FavoritesProvider>
                 <RealtimeFiltersProvider>
                   <QueryClientProvider client={queryClient}>
-                    <ConvexProvider client={convex}>
+                    <ConvexAuthProvider
+                      client={convex}
+                      storage={{
+                        getItem: async (key: string) => SecureStore.getItemAsync(key),
+                        setItem: async (key: string, value: string) => SecureStore.setItemAsync(key, value),
+                        removeItem: async (key: string) => SecureStore.deleteItemAsync(key),
+                      }}
+                    >
                       <AuthProvider>
                         <RevenueCatProvider>
                           <ExpoStripeProvider>
@@ -206,7 +221,7 @@ export default Sentry.wrap
                           </ExpoStripeProvider>
                         </RevenueCatProvider>
                       </AuthProvider>
-                    </ConvexProvider>
+                    </ConvexAuthProvider>
                   </QueryClientProvider>
                 </RealtimeFiltersProvider>
               </FavoritesProvider>

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && bun install",
+  "buildCommand": "cd ../.. && bun run build --filter=@haus/appraisal",
+  "outputDirectory": ".next",
+  "ignoreCommand": "npx turbo-ignore"
+}

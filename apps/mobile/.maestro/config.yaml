@@ -1,0 +1,13 @@
+# Maestro Configuration for HAUS Platform
+appId: com.aliaslabs.haus
+# Ensure local simulator/device is used
+- "Studio"
+# Allow for longer animations on device
+initTimeout: 60000
+# Commands separated by newlines
+onFlowStart:
+  - echo "Starting Maestro test flow..."
+onFlowComplete:
+  - echo "Maestro test flow completed successfully!"
+onFlowFailed:
+  - echo "Maestro test flow failed!"

@@ -243,7 +243,7 @@ Property Search Parameters to Collect:
 - Special requirements (pets, pool, etc.)
 
 When you find a property that might interest them, mention the key details clearly.
-If you don't have enough information to search, ask for more details."""
+If you don't have enough information to search, ask for more details. Use scrape_listings(query, site='domain') to scrape live listings from websites like domain.com.au when internal search is insufficient."""
 
     async def on_user_turn_completed(
         self, turn_ctx: ChatContext, new_message: ChatMessage

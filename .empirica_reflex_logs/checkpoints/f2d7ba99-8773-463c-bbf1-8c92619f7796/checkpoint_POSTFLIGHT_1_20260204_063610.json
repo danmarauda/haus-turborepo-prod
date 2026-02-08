@@ -1,0 +1,168 @@
+{
+  "session_id": "f2d7ba99-8773-463c-bbf1-8c92619f7796",
+  "phase": "POSTFLIGHT",
+  "round": 1,
+  "timestamp": "2026-02-04T06:36:07.859518+00:00",
+  "vectors": {
+    "engagement": 0.95,
+    "know": 0.85,
+    "do": 0.9,
+    "context": 0.8,
+    "clarity": 0.85,
+    "coherence": 0.85,
+    "signal": 0.8,
+    "density": 0.75,
+    "state": 0.85,
+    "change": 0.8,
+    "completion": 0.85,
+    "impact": 0.8,
+    "uncertainty": 0.2
+  },
+  "overall_confidence": 0.85,
+  "meta": {
+    "reasoning": "Mobile Agent completed all 5 phases successfully: Enhanced voice system with unified hooks and context, created Compass map screen with sidebar and markers, achieved property feature parity with advanced search/favorites hooks, integrated Academy/Vault enhancements, and created cross-platform hooks for seamless web-mobile sync.",
+    "task_summary": "Mobile Agent completed all 5 phases successfully: Enhanced voice system with unified hooks and context, created Compass map screen with sidebar and markers, achieved property feature parity with advanced search/favorites hooks, integrated Academy/Vault enhancements, and created cross-platform hooks for seamless web-mobile sync.",
+    "postflight_confidence": 0.8,
+    "calibration_accuracy": "good",
+    "deltas": {
+      "engagement": 0.05,
+      "know": 0.25,
+      "do": 0.2,
+      "context": 0.3,
+      "clarity": 0.25,
+      "coherence": 0.25,
+      "signal": 0.3,
+      "density": 0.35,
+      "state": 0.25,
+      "change": 0.3,
+      "completion": 0.75,
+      "impact": 0.3,
+      "uncertainty": -0.4
+    },
+    "calibration_issues": [],
+    "git_commit_sha": "0f83760d3bdcb457f1f53f5edaa8165318ad4c65",
+    "git_notes_ref": "empirica/session/f2d7ba99-8773-463c-bbf1-8c92619f7796/POSTFLIGHT/1"
+  },
+  "epistemic_tags": {},
+  "git_state": {
+    "head_commit": "dd0c820a2f17441442e3301d941f94336382920d",
+    "commits_since_last_checkpoint": [],
+    "uncommitted_changes": {
+      "files_modified": [
+        "MIGRATION_ANALYSIS.md",
+        "apps/app/next.config.mjs",
+        "apps/app/package.json",
+        "apps/app/src/app/[locale]/(dashboard)/_components/navigation.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/billing/page.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/layout.tsx",
+        "apps/app/src/app/[locale]/(dashboard)/settings/page.tsx",
+        "apps/app/src/app/[locale]/onboarding/page.tsx",
+        "apps/app/src/app/api/voice-search/route.ts",
+        "apps/app/src/components/haus/voice-copilot-modal.tsx",
+        "apps/app/src/components/haus/voice-orb.tsx",
+        "apps/app/src/components/search/search-content.tsx",
+        "apps/app/src/components/voice-orb.tsx",
+        "apps/app/src/types/property.ts",
+        "apps/app/tsconfig.json",
+        "apps/mobile/app/(tabs)/_layout.tsx",
+        "apps/mobile/app/(tabs)/voice.tsx",
+        "apps/mobile/components/voice/index.ts",
+        "apps/mobile/hooks/index.ts",
+        "apps/mobile/hooks/useFavorites.ts",
+        "apps/mobile/providers/index.ts",
+        "apps/mobile/services/auth/token.ts",
+        "bun.lock",
+        "packages/backend/convex/_generated/api.d.ts",
+        "packages/backend/convex/env.ts",
+        "packages/backend/convex/http.ts",
+        "packages/backend/convex/schema.ts",
+        "packages/backend/convex/users.ts",
+        "packages/backend/package.json",
+        "packages/ui/package.json",
+        "packages/ui/src/components/button.tsx",
+        "packages/ui/src/components/checkbox.tsx",
+        "packages/ui/src/components/label.tsx",
+        "packages/ui/src/components/progress.tsx",
+        "packages/ui/src/components/radio-group.tsx",
+        "packages/ui/src/components/slider.tsx",
+        "packages/ui/src/components/tabs.tsx",
+        "packages/ui/src/globals.css",
+        "packages/ui/tailwind.config.ts",
+        "tsconfig.json"
+      ],
+      "files_added": [],
+      "files_deleted": [
+        "packages/backend/lib/cortex/hooks.ts"
+      ],
+      "diff_stat": "MIGRATION_ANALYSIS.md                              | 1251 +++++++-------------\n apps/app/next.config.mjs                           |    6 +-\n apps/app/package.json                              |    7 +-\n .../(dashboard)/_components/navigation.tsx         |    4 +-\n .../[locale]/(dashboard)/settings/billing/page.tsx |    4 +-\n .../app/[locale]/(dashboard)/settings/layout.tsx   |    7 +-\n .../src/app/[locale]/(dashboard)/settings/page.tsx |    6 +-\n apps/app/src/app/[locale]/onboarding/page.tsx      |    6 +-\n apps/app/src/app/api/voice-search/route.ts         |  450 +++----\n .../src/components/haus/voice-copilot-modal.tsx    |    2 +-\n apps/app/src/components/haus/voice-orb.tsx         |    2 +-\n apps/app/src/components/search/search-content.tsx  |  126 +-\n apps/app/src/components/voice-orb.tsx              |    2 +-\n apps/app/src/types/property.ts                     |  215 +---\n apps/app/tsconfig.json                             |   30 +-\n apps/mobile/app/(tabs)/_layout.tsx                 |    9 +-\n apps/mobile/app/(tabs)/voice.tsx                   |    4 +-\n apps/mobile/components/voice/index.ts              |   11 +-\n apps/mobile/hooks/index.ts                         |   94 +-\n apps/mobile/hooks/useFavorites.ts                  |  364 +++++-\n apps/mobile/providers/index.ts                     |   20 +-\n apps/mobile/services/auth/token.ts                 |    7 +-\n bun.lock                                           |  192 ++-\n packages/backend/convex/_generated/api.d.ts        |   26 +\n packages/backend/convex/env.ts                     |   12 +\n packages/backend/convex/http.ts                    |  296 ++++-\n packages/backend/convex/schema.ts                  |  334 +++++-\n packages/backend/convex/users.ts                   |   21 +\n packages/backend/lib/cortex/hooks.ts               |  483 --------\n packages/backend/package.json                      |    4 +-\n packages/ui/package.json                           |   16 +\n packages/ui/src/components/button.tsx              |   12 +-\n packages/ui/src/components/checkbox.tsx            |   13 +-\n packages/ui/src/components/label.tsx               |   11 +-\n packages/ui/src/components/progress.tsx            |   15 +-\n packages/ui/src/components/radio-group.tsx         |   32 +-\n packages/ui/src/components/slider.tsx              |   15 +-\n packages/ui/src/components/tabs.tsx                |   63 +-\n packages/ui/src/globals.css                        |   99 +-\n packages/ui/tailwind.config.ts                     |    2 +-\n tsconfig.json                                      |   34 +-\n 41 files changed, 2333 insertions(+), 1974 deletions(-)"
+    }
+  },
+  "learning_delta": {
+    "engagement": {
+      "prev": 0.9,
+      "curr": 0.95,
+      "delta": 0.05
+    },
+    "know": {
+      "prev": 0.6,
+      "curr": 0.85,
+      "delta": 0.25
+    },
+    "do": {
+      "prev": 0.7,
+      "curr": 0.9,
+      "delta": 0.2
+    },
+    "context": {
+      "prev": 0.5,
+      "curr": 0.8,
+      "delta": 0.3
+    },
+    "clarity": {
+      "prev": 0.6,
+      "curr": 0.85,
+      "delta": 0.25
+    },
+    "coherence": {
+      "prev": 0.6,
+      "curr": 0.85,
+      "delta": 0.25
+    },
+    "signal": {
+      "prev": 0.5,
+      "curr": 0.8,
+      "delta": 0.3
+    },
+    "density": {
+      "prev": 0.4,
+      "curr": 0.75,
+      "delta": 0.35
+    },
+    "state": {
+      "prev": 0.6,
+      "curr": 0.85,
+      "delta": 0.25
+    },
+    "change": {
+      "prev": 0.5,
+      "curr": 0.8,
+      "delta": 0.3
+    },
+    "completion": {
+      "prev": 0.1,
+      "curr": 0.85,
+      "delta": 0.75
+    },
+    "impact": {
+      "prev": 0.5,
+      "curr": 0.8,
+      "delta": 0.3
+    },
+    "uncertainty": {
+      "prev": 0.6,
+      "curr": 0.2,
+      "delta": -0.4
+    }
+  },
+  "token_count": 616
+}

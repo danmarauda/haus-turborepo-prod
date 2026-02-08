@@ -14,6 +14,7 @@ import { v } from "convex/values";
 import { ANONYMOUS_USER } from "../lib/constants";
 import { mutation, query } from "./_generated/server";
 import { api } from "./_generated/api";
+import { RateLimits, assertRateLimit } from "./rateLimit";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -31,6 +32,7 @@ import { api } from "./_generated/api";
  * @param userQuery - What the user said/asked
  * @param agentResponse - What the agent responded
  * @param propertyContext - Optional property details (id, suburb, price, etc.)
+ * Rate limit: 200 requests/minute per user (memory operations)
  */
 export const rememberVoiceSearch = mutation({
   args: {
@@ -42,6 +44,16 @@ export const rememberVoiceSearch = mutation({
   },
   handler: async (ctx, args) => {
     const { userId, userQuery, agentResponse, propertyId, propertyContext } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.MEMORY_OPERATIONS.keyPrefix,
+      RateLimits.MEMORY_OPERATIONS.maxRequests,
+      RateLimits.MEMORY_OPERATIONS.windowMs
+    );
 
     // Get or create user's memory space
     let user = await ctx.db
@@ -272,6 +284,7 @@ export const recallForQuery = query({
  *
  * @param userId - User ID from auth
  * @returns memorySpaceId - The user's memory space ID
+ * Rate limit: 200 requests/minute per user (memory operations)
  */
 export const ensureMemorySpace = mutation({
   args: {
@@ -279,6 +292,16 @@ export const ensureMemorySpace = mutation({
   },
   handler: async (ctx, args) => {
     const { userId } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.MEMORY_OPERATIONS.keyPrefix,
+      RateLimits.MEMORY_OPERATIONS.maxRequests,
+      RateLimits.MEMORY_OPERATIONS.windowMs
+    );
 
     // Check if user exists
     const user = await ctx.db
@@ -330,6 +353,7 @@ export const ensureMemorySpace = mutation({
  * @param category - Preference category (suburb, price, propertyType, etc.)
  * @param preference - The preference value
  * @param confidence - Confidence score (0-100)
+ * Rate limit: 200 requests/minute per user (memory operations)
  */
 export const storePreference = mutation({
   args: {
@@ -341,6 +365,16 @@ export const storePreference = mutation({
   },
   handler: async (ctx, args) => {
     const { userId, category, preference, confidence, metadata } = args;
+
+    // Apply rate limiting
+    const identifier = userId !== ANONYMOUS_USER ? `user:${userId}` : `anon:${ctx.runId}`;
+    await assertRateLimit(
+      ctx,
+      identifier,
+      RateLimits.MEMORY_OPERATIONS.keyPrefix,
+      RateLimits.MEMORY_OPERATIONS.maxRequests,
+      RateLimits.MEMORY_OPERATIONS.windowMs
+    );
 
     // Get user's memory space
     const user = await ctx.db

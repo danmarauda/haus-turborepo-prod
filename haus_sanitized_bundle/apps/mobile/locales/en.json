@@ -1,0 +1,76 @@
+{
+  "app": {
+    "name": "HAUS",
+    "tagline": "AI-Native Property Intelligence"
+  },
+  "tabs": {
+    "home": "Home",
+    "search": "Search",
+    "compass": "Compass",
+    "saved": "Saved",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signInError": "Invalid email or password",
+    "signUpError": "Failed to create account",
+    "signInSuccess": "Welcome back!",
+    "signUpSuccess": "Account created successfully"
+  },
+  "search": {
+    "title": "Property Search",
+    "placeholder": "Describe your ideal property...",
+    "listening": "Listening...",
+    "processing": "Processing...",
+    "filters": "Filters",
+    "results": "Results",
+    "noResults": "No properties found",
+    "tryDifferent": "Try different search terms"
+  },
+  "property": {
+    "title": "Property Details",
+    "price": "Price",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "parking": "Parking",
+    "landSize": "Land Size",
+    "description": "Description",
+    "features": "Features",
+    "location": "Location",
+    "save": "Save Property",
+    "unsave": "Unsave",
+    "contact": "Contact Agent",
+    "tour": "Book Tour",
+    "saved": "Property saved",
+    "unsaved": "Property removed"
+  },
+  "voice": {
+    "tapToSpeak": "Tap to speak",
+    "listening": "Listening...",
+    "processing": "Processing...",
+    "error": "Could not understand. Please try again.",
+    "microphonePermission": "Microphone permission is required for voice search."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done"
+  }
+}

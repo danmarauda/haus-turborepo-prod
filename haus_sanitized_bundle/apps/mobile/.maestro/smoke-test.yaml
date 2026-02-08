@@ -1,0 +1,119 @@
+---
+# HAUS Mobile - Comprehensive Smoke Test
+# Full end-to-end test of critical user flows
+
+appId: com.haus.app
+---
+- launchApp
+
+# === ONBOARDING FLOW ===
+- assertVisible: "Welcome to HAUS"
+- assertVisible: "AI-Native Property Intelligence"
+
+# Swipe through onboarding
+- swipe:
+    direction: LEFT
+- assertVisible: "Voice Search"
+
+- swipe:
+    direction: LEFT
+- assertVisible: "Market Analytics"
+
+- swipe:
+    direction: LEFT
+- assertVisible: "Get Started"
+- tapOn: "Get Started"
+
+# === AUTH SCREEN ===
+- assertVisible: "Welcome back"
+- assertVisible: "Sign In"
+- tapOn: "Sign Up"
+
+# === SIGN UP FLOW ===
+- assertVisible: "Create account"
+- assertVisible: "Full Name"
+- tapOn: "Full Name"
+- inputText: "Maestro Test User"
+
+- tapOn: "Email"
+- inputText: "maestro@haus.com"
+
+- tapOn: "Password"
+- inputText: "MaestroTest123!"
+
+- tapOn: "Create Account"
+- waitForAnimationToEnd
+
+# === TABS NAVIGATION ===
+# Home tab
+- assertVisible: "Home"
+- assertVisible: "Featured Properties"
+
+# Search tab
+- tapOn: "Search"
+- assertVisible: "Voice Search"
+- assertVisible: "Tell us what you're looking for"
+
+# Market tab
+- tapOn: "Market"
+- assertVisible: "Market"
+
+# Agency tab
+- tapOn: "Agency"
+- assertVisible: "Agency"
+
+# Premium tab
+- tapOn: "Premium"
+- assertVisible: "HAUS Premium"
+- assertVisible: "Subscribe"
+
+# Profile tab
+- tapOn: "Profile"
+- assertVisible: "Profile"
+
+# Settings tab
+- tapOn: "Settings"
+- assertVisible: "Settings"
+- assertVisible: "Language"
+- assertVisible: "Appearance"
+
+# === SETTINGS FLOW ===
+# Change language
+- tapOn: "Español"
+- waitForAnimationToEnd
+
+# Change theme
+- tapOn: "Light"
+- waitForAnimationToEnd
+
+# Sign out
+- tapOn: "Sign Out"
+- assertVisible: "Are you sure you want to sign out?"
+- tapOn: "Cancel"
+
+# Verify still in settings
+- assertVisible: "Settings"
+
+# === SIGN IN FLOW ===
+- tapOn: "Back" # go to profile
+- tapOn: "Sign Out" # from profile screen
+- assertVisible: "Are you sure you want to sign out?"
+- tapOn: "Sign Out"
+- waitForAnimationToEnd
+
+- assertVisible: "Welcome back"
+- tapOn: "Email"
+- inputText: "maestro@haus.com"
+
+- tapOn: "Password"
+- inputText: "MaestroTest123!"
+
+- tapOn: "Sign In"
+- waitForAnimationToEnd
+
+# Verify back in tabs
+- assertVisible: "Home"
+- assertVisible: "Featured Properties"
+
+# === TEST COMPLETE ===
+- takeScreenshot: test-complete

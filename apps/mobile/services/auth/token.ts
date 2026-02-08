@@ -2,9 +2,10 @@ import { SignJWT, jwtVerify } from 'jose';
 
 // JWT Configuration for React Native authentication
 // In production, these should be environment variables
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.EXPO_PUBLIC_JWT_SECRET || 'your-secret-key-change-in-production'
-);
+if (!process.env.EXPO_PUBLIC_JWT_SECRET) {
+  throw new Error('EXPO_PUBLIC_JWT_SECRET environment variable is required');
+}
+const JWT_SECRET = new TextEncoder().encode(process.env.EXPO_PUBLIC_JWT_SECRET);
 
 export interface TokenPayload {
   userId: string;

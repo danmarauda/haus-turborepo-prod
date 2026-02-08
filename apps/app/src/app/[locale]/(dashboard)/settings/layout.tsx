@@ -50,12 +50,13 @@ const LayoutContainer = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default function Layout({
+export default async function Layout({
   children,
   params,
-}: { children: React.ReactNode; params: { locale: string } }) {
+}: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
-    <I18nProviderClient locale={params.locale}>
+    <I18nProviderClient locale={locale}>
       <LayoutContainer>{children}</LayoutContainer>
     </I18nProviderClient>
   );

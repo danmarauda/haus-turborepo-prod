@@ -1,0 +1,26 @@
+# MAESTRO FLOW: Quick Access Cards
+# Tests the quick access cards on home screen
+
+appId: com.aliaslabs.haus
+---
+- launchApp
+- waitForAnimationToEnd
+- tryTo:
+    tapOn: "HAUS Voice Agent"
+# Scroll to find quick access section
+- scroll
+- assertVisible: "Quick Access"
+# Test Exclusive Properties card
+- tapOn:
+    id: "exclusive-card"
+- waitForAnimationToEnd
+- assertVisible: "Exclusive"
+# Go back
+- pressBack
+# Test Dashboard card
+- tapOn:
+    id: "dashboard-card"
+- waitForAnimationToEnd
+- assertVisible: "Dashboard"
+# Go back
+- pressBack
